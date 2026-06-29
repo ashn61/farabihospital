@@ -150,7 +150,7 @@ Veri katmanı, DB satırını mevcut `Doctor` / `NewsItem` / `NewsData` tiplerin
 ## Ortam değişkenleri
 
 `.env.local` (ve Vercel proje ayarları):
-- `NEXT_PUBLIC_SUPABASE_URL` = `https://ypxdmkknlkjxtakwwyqq.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_URL` = `https://nvnezyiqvywlwfxtlmuq.supabase.co`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = (Supabase Settings → API)
 - `SUPABASE_SERVICE_ROLE_KEY` = (gizli; yalnızca sunucu/seed/yükleme)
 
@@ -165,8 +165,8 @@ Anahtarlar koda/commit'e **asla** gömülmez; sadece env değişken adları kull
 
 ## Kullanıcının yapacağı (kod dışı) adımlar
 
-1. Supabase projesini açmak (yapıldı: ref `ypxdmkknlkjxtakwwyqq`) ve anon + service_role
-   anahtarlarını `.env.local`'e koymak.
+1. Supabase projesini açmak (yapıldı: ref `nvnezyiqvywlwfxtlmuq`) ve anon + service_role
+   anahtarlarını `.env.local`'e koymak. (yapıldı)
 2. Supabase panelinden admin kullanıcısını (e-posta+şifre) oluşturmak.
 3. Tabloları/bucket'ı kurmak için hazırlanacak SQL'i Supabase SQL editöründe çalıştırmak.
 4. Vercel'e aynı ortam değişkenlerini girmek.
