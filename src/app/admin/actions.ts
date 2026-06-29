@@ -48,14 +48,19 @@ export async function deleteDoctor(id: string): Promise<void> {
   revalidatePath(`/doctors/${id}`);
 }
 
-export async function saveNews(row: Omit<NewsRow, "id"> & { id?: string }): Promise<void> {
+export async function saveNews(row: Omit<NewsRow, "id"> & { id?: string }): Promise<{ id: string }> {
   await requireUser();
   const admin = createAdminClient();
-  const { error } = row.id
-    ? await admin.from("news").update(row).eq("id", row.id)
-    : await admin.from("news").insert(row);
+  if (row.id) {
+    const { error } = await admin.from("news").update(row).eq("id", row.id);
+    if (error) throw new Error(`saveNews failed: ${error.message}`);
+    revalidatePath("/");
+    return { id: row.id };
+  }
+  const { data, error } = await admin.from("news").insert(row).select("id").single();
   if (error) throw new Error(`saveNews failed: ${error.message}`);
   revalidatePath("/");
+  return { id: (data as { id: string }).id };
 }
 
 export async function deleteNews(id: string): Promise<void> {

@@ -13,3 +13,15 @@ export async function getNews(): Promise<NewsData> {
   if (error) throw new Error(`getNews failed: ${error.message}`);
   return rowsToNewsData((data ?? []) as NewsRow[]);
 }
+
+export async function getNewsRows(): Promise<NewsRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("news")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(`getNewsRows failed: ${error.message}`);
+  return (data ?? []) as NewsRow[];
+}
