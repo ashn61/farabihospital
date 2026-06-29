@@ -2,6 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { doctorToRow, type NewsRow } from "@/lib/data/mappers";
+import type { Doctor } from "@/lib/doctors";
 
 export async function requireUser() {
   const supabase = await createClient();
@@ -26,10 +29,6 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   revalidatePath("/admin");
 }
-
-import { createAdminClient } from "@/lib/supabase/admin";
-import { doctorToRow, type NewsRow } from "@/lib/data/mappers";
-import type { Doctor } from "@/lib/doctors";
 
 export async function saveDoctor(doc: Doctor, sortOrder: number): Promise<void> {
   await requireUser();
@@ -75,13 +74,13 @@ export async function uploadImage(formData: FormData): Promise<{ url: string }> 
 
   const admin = createAdminClient();
   const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `${folder}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await admin.storage.from("media").upload(path, file, {
+  const storagePath = `${folder}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await admin.storage.from("media").upload(storagePath, file, {
     contentType: file.type,
     upsert: false,
   });
   if (error) throw new Error(`uploadImage failed: ${error.message}`);
 
-  const { data } = admin.storage.from("media").getPublicUrl(path);
+  const { data } = admin.storage.from("media").getPublicUrl(storagePath);
   return { url: data.publicUrl };
 }
