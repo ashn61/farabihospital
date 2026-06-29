@@ -1,0 +1,73 @@
+-- Doctors -------------------------------------------------------------
+create table if not exists public.doctors (
+  id              text primary key,
+  name            text not null,
+  title           text not null,
+  image           text not null,
+  specialty_tr    text not null,
+  specialty_en    text not null,
+  specialty_ar    text,
+  specialty_ru    text not null,
+  specialty_ka    text not null,
+  category        text not null check (category in ('surgical','internal')),
+  stats_patients  integer not null default 0,
+  stats_experience integer not null default 0,
+  stats_surgeries integer,
+  email           text not null,
+  education_tr    text[] not null default '{}',
+  education_en    text[] not null default '{}',
+  education_ar    text[],
+  bio_tr          text not null default '',
+  bio_en          text not null default '',
+  bio_ar          text,
+  bio_ru          text not null default '',
+  bio_ka          text not null default '',
+  sort_order      integer not null default 0,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
+);
+
+-- News ----------------------------------------------------------------
+create table if not exists public.news (
+  id              uuid primary key default gen_random_uuid(),
+  image           text not null,
+  name_tr         text not null default '',
+  name_en         text not null default '',
+  name_ar         text not null default '',
+  name_ru         text not null default '',
+  name_ka         text not null default '',
+  designation_tr  text not null default '',
+  designation_en  text not null default '',
+  designation_ar  text not null default '',
+  designation_ru  text not null default '',
+  designation_ka  text not null default '',
+  quote_tr        text not null default '',
+  quote_en        text not null default '',
+  quote_ar        text not null default '',
+  quote_ru        text not null default '',
+  quote_ka        text not null default '',
+  sort_order      integer not null default 0,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now()
+);
+
+-- Row Level Security: public READ, writes only via service role --------
+alter table public.doctors enable row level security;
+alter table public.news    enable row level security;
+
+drop policy if exists "public read doctors" on public.doctors;
+create policy "public read doctors" on public.doctors for select using (true);
+
+drop policy if exists "public read news" on public.news;
+create policy "public read news" on public.news for select using (true);
+-- (No insert/update/delete policies: the service-role key bypasses RLS;
+--  the anon key therefore cannot write.)
+
+-- Storage bucket for uploaded images ----------------------------------
+insert into storage.buckets (id, name, public)
+values ('media', 'media', true)
+on conflict (id) do nothing;
+
+drop policy if exists "public read media" on storage.objects;
+create policy "public read media" on storage.objects
+  for select using (bucket_id = 'media');
