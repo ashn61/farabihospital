@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { doctorToRow, type NewsRow } from "@/lib/data/mappers";
 import type { Doctor } from "@/lib/doctors";
 
-export async function requireUser() {
+async function requireUser() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) throw new Error("Unauthorized");
@@ -77,9 +77,11 @@ export async function uploadImage(formData: FormData): Promise<{ url: string }> 
   const folder = String(formData.get("folder") ?? "doctors");
   if (!file) throw new Error("uploadImage: no file");
 
+  const safeFolder = folder === "news" ? "news" : "doctors";
   const admin = createAdminClient();
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const storagePath = `${folder}/${crypto.randomUUID()}.${ext}`;
+  const rawExt = (file.name.split(".").pop() ?? "jpg");
+  const ext = rawExt.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() || "jpg";
+  const storagePath = `${safeFolder}/${crypto.randomUUID()}.${ext}`;
   const { error } = await admin.storage.from("media").upload(storagePath, file, {
     contentType: file.type,
     upsert: false,
