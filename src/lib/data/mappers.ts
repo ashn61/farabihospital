@@ -82,7 +82,7 @@ export function doctorToRow(doc: Doctor, sortOrder = 0): DoctorRow {
     category: doc.category,
     stats_patients: doc.stats.patients,
     stats_experience: doc.stats.experience,
-    stats_surgeries: doc.category === "surgical" ? doc.stats.surgeries ?? 0 : null,
+    stats_surgeries: doc.category === "surgical" ? doc.stats.surgeries ?? null : null,
     email: doc.email,
     education_tr: doc.educationTr ?? [],
     education_en: doc.educationEn ?? [],

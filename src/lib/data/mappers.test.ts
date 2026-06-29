@@ -56,6 +56,12 @@ describe("doctorToRow", () => {
     const row = doctorToRow(doc);
     expect(row.stats_surgeries).toBeNull();
   });
+
+  it("writes null stats_surgeries for a surgical doctor with no surgeries value", () => {
+    const doc = rowToDoctor({ ...sampleRow, stats_surgeries: null }); // surgical, surgeries undefined
+    const row = doctorToRow(doc);
+    expect(row.stats_surgeries).toBeNull();
+  });
 });
 
 describe("rowsToNewsData", () => {
@@ -71,6 +77,7 @@ describe("rowsToNewsData", () => {
     const data = rowsToNewsData([row]);
     expect(data.tr[0]).toEqual({ name: "Başlık", designation: "Etiket", quote: "Açıklama", src: "https://img/1.jpg" });
     expect(data.en[0].name).toBe("Title");
+    expect(data.ru[0].name).toBe("Заголовок");
     expect(data.ka[0].quote).toBe("აღწერა");
   });
 });
