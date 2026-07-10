@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { units, findUnitByTr } from "@/lib/units";
 import {
   Users,
   Newspaper,
@@ -677,14 +678,29 @@ export default function AdminPanel({
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-[10px] font-black text-primary uppercase tracking-wider mb-1.5">Kategori</label>
+                            <label className="block text-[10px] font-black text-primary uppercase tracking-wider mb-1.5">Birim</label>
                             <select
-                              value={docCategory}
-                              onChange={(e) => setDocCategory(e.target.value as "surgical" | "internal")}
+                              value={docSpec.tr}
+                              onChange={(e) => {
+                                const u = findUnitByTr(e.target.value);
+                                if (u) {
+                                  setDocCategory(u.type);
+                                  setDocSpec({ tr: u.tr, en: u.en, ar: u.ar, ru: u.ru, ka: u.ka });
+                                }
+                              }}
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary text-primary"
                             >
-                              <option value="surgical">Cerrahi Birim</option>
-                              <option value="internal">Dahili Birim</option>
+                              <option value="" disabled>Birim seçin</option>
+                              <optgroup label="Cerrahi Birimler">
+                                {units.filter((u) => u.type === "surgical").map((u) => (
+                                  <option key={u.tr} value={u.tr}>{u.tr}</option>
+                                ))}
+                              </optgroup>
+                              <optgroup label="Dahili Birimler">
+                                {units.filter((u) => u.type === "internal").map((u) => (
+                                  <option key={u.tr} value={u.tr}>{u.tr}</option>
+                                ))}
+                              </optgroup>
                             </select>
                           </div>
                           <div>
@@ -773,59 +789,9 @@ export default function AdminPanel({
                     {/* Specialty & Bio languages Tab */}
                     {doctorFormTab === "langs" && (
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
-                        <div className="space-y-3">
-                          <h4 className="text-xs font-black text-primary uppercase tracking-wider">Uzmanlık Alanı (Birim)</h4>
-                          <div>
-                            <label className="block text-[9px] font-bold text-slate-400 mb-1">Türkçe (TR) *</label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="Göğüs Cerrahisi"
-                              value={docSpec.tr}
-                              onChange={(e) => setDocSpec({...docSpec, tr: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[9px] font-bold text-slate-400 mb-1">İngilizce (EN)</label>
-                            <input
-                              type="text"
-                              placeholder="Thoracic Surgery"
-                              value={docSpec.en}
-                              onChange={(e) => setDocSpec({...docSpec, en: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[9px] font-bold text-slate-400 mb-1">Arapça (AR)</label>
-                            <input
-                              type="text"
-                              placeholder="جراحة الصدر"
-                              value={docSpec.ar}
-                              onChange={(e) => setDocSpec({...docSpec, ar: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[9px] font-bold text-slate-400 mb-1">Rusça (RU)</label>
-                            <input
-                              type="text"
-                              placeholder="Торакальная хирургия"
-                              value={docSpec.ru}
-                              onChange={(e) => setDocSpec({...docSpec, ru: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[9px] font-bold text-slate-400 mb-1">Gürcüce (KA)</label>
-                            <input
-                              type="text"
-                              placeholder="თორაკალური ქირურგია"
-                              value={docSpec.ka}
-                              onChange={(e) => setDocSpec({...docSpec, ka: e.target.value})}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary"
-                            />
-                          </div>
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+                          <p className="text-[9px] font-bold text-slate-400 mb-0.5">Seçili Birim</p>
+                          <p className="text-xs font-black text-primary">{docSpec.tr || "— Temel bilgiler sekmesinden birim seçin —"}</p>
                         </div>
 
                         <div className="space-y-3 border-t border-slate-100 pt-4">
