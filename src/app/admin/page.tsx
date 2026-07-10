@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getDoctors } from "@/lib/data/doctors";
 import { getNewsRows } from "@/lib/data/news";
+import { getUnits } from "@/lib/data/units";
 import LoginForm from "@/components/admin/LoginForm";
 import AdminPanel from "@/components/admin/AdminPanel";
 
@@ -11,6 +12,6 @@ export default async function AdminPage() {
   const { data } = await supabase.auth.getUser();
   if (!data.user) return <LoginForm />;
 
-  const [doctors, newsRows] = await Promise.all([getDoctors(), getNewsRows()]);
-  return <AdminPanel initialDoctors={doctors} initialNewsRows={newsRows} />;
+  const [doctors, newsRows, units] = await Promise.all([getDoctors(), getNewsRows(), getUnits()]);
+  return <AdminPanel initialDoctors={doctors} initialNewsRows={newsRows} initialUnits={units} />;
 }

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { doctorToRow, type NewsRow } from "@/lib/data/mappers";
 import type { Doctor } from "@/lib/doctors";
+import type { UnitType } from "@/lib/units";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -69,6 +70,52 @@ export async function deleteNews(id: string): Promise<void> {
   const { error } = await admin.from("news").delete().eq("id", id);
   if (error) throw new Error(`deleteNews failed: ${error.message}`);
   revalidatePath("/");
+}
+
+export interface UnitInput {
+  id?: string;
+  tr: string;
+  en: string;
+  ar: string;
+  ru: string;
+  ka: string;
+  type: UnitType;
+  sort_order?: number;
+}
+
+export async function saveUnit(unit: UnitInput): Promise<{ id: string }> {
+  await requireUser();
+  const admin = createAdminClient();
+  const row = {
+    tr: unit.tr,
+    en: unit.en,
+    ar: unit.ar,
+    ru: unit.ru,
+    ka: unit.ka,
+    type: unit.type,
+    sort_order: unit.sort_order ?? 0,
+  };
+  if (unit.id) {
+    const { error } = await admin.from("units").update(row).eq("id", unit.id);
+    if (error) throw new Error(`saveUnit failed: ${error.message}`);
+    revalidatePath("/");
+    revalidatePath("/admin");
+    return { id: unit.id };
+  }
+  const { data, error } = await admin.from("units").insert(row).select("id").single();
+  if (error) throw new Error(`saveUnit failed: ${error.message}`);
+  revalidatePath("/");
+  revalidatePath("/admin");
+  return { id: (data as { id: string }).id };
+}
+
+export async function deleteUnit(id: string): Promise<void> {
+  await requireUser();
+  const admin = createAdminClient();
+  const { error } = await admin.from("units").delete().eq("id", id);
+  if (error) throw new Error(`deleteUnit failed: ${error.message}`);
+  revalidatePath("/");
+  revalidatePath("/admin");
 }
 
 export async function uploadImage(formData: FormData): Promise<{ url: string }> {

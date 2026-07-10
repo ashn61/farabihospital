@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { units, findUnitByTr } from "@/lib/units";
+import { type UnitType } from "@/lib/units";
+import type { UnitRecord } from "@/lib/data/mappers";
 import {
   Users,
   Newspaper,
@@ -25,25 +26,28 @@ import Navbar, { Locale } from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import { Doctor, getCleanName, formatDoctorName } from "@/lib/doctors";
 import { NewsRow } from "@/lib/data/mappers";
-import { signOut, saveDoctor, deleteDoctor, saveNews, deleteNews, uploadImage } from "@/app/admin/actions";
+import { signOut, saveDoctor, deleteDoctor, saveNews, deleteNews, saveUnit, deleteUnit, uploadImage } from "@/app/admin/actions";
 
 const generateRandomId = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 export default function AdminPanel({
   initialDoctors,
   initialNewsRows,
+  initialUnits,
 }: {
   initialDoctors: Doctor[];
   initialNewsRows: NewsRow[];
+  initialUnits: UnitRecord[];
 }) {
   const [locale, setLocale] = useState<Locale>("tr");
 
   // Core Dynamic States
   const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
   const [newsRows, setNewsRows] = useState<NewsRow[]>(initialNewsRows);
+  const [units, setUnits] = useState<UnitRecord[]>(initialUnits);
 
   // UI States
-  const [activeTab, setActiveTab] = useState<"doctors" | "news" | "settings">("doctors");
+  const [activeTab, setActiveTab] = useState<"doctors" | "news" | "units" | "settings">("doctors");
   const [doctorFormTab, setDoctorFormTab] = useState<"basic" | "langs" | "edu">("basic");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchNewsTerm, setSearchNewsTerm] = useState("");
@@ -389,6 +393,68 @@ export default function AdminPanel({
     }
   };
 
+  // Unit (Birim) form + handlers
+  const emptyUnitForm = { tr: "", en: "", ar: "", ru: "", ka: "", type: "internal" as UnitType };
+  const [editingUnitId, setEditingUnitId] = useState<string | null>(null);
+  const [unitForm, setUnitForm] = useState(emptyUnitForm);
+  const [savingUnit, setSavingUnit] = useState(false);
+  const [searchUnitTerm, setSearchUnitTerm] = useState("");
+
+  const resetUnitForm = () => {
+    setEditingUnitId(null);
+    setUnitForm(emptyUnitForm);
+  };
+
+  const handleEditUnit = (u: UnitRecord) => {
+    setEditingUnitId(u.id);
+    setUnitForm({ tr: u.tr, en: u.en, ar: u.ar, ru: u.ru, ka: u.ka, type: u.type });
+    setActiveTab("units");
+  };
+
+  const handleSaveUnit = async () => {
+    if (![unitForm.tr, unitForm.en, unitForm.ar, unitForm.ru, unitForm.ka].every(v => v.trim())) {
+      showNotification("Tüm dil alanları (TR/EN/AR/RU/KA) zorunludur.", "error");
+      return;
+    }
+    setSavingUnit(true);
+    try {
+      if (editingUnitId) {
+        await saveUnit({ id: editingUnitId, ...unitForm });
+        setUnits(units.map(u => (u.id === editingUnitId ? { ...u, ...unitForm } : u)));
+        showNotification("Birim başarıyla güncellendi.");
+      } else {
+        const { id } = await saveUnit({ ...unitForm, sort_order: units.length });
+        setUnits([...units, { id, ...unitForm }]);
+        showNotification("Birim başarıyla eklendi.");
+      }
+      resetUnitForm();
+    } catch (err) {
+      console.error(err);
+      showNotification("Birim kaydedilirken bir hata oluştu.", "error");
+    } finally {
+      setSavingUnit(false);
+    }
+  };
+
+  const handleDeleteUnit = async (id: string, tr: string) => {
+    const inUse = doctors.some(d => d.specialtyTr === tr);
+    if (inUse) {
+      showNotification(`"${tr}" bir veya daha fazla hekim tarafından kullanılıyor; önce onları başka birime taşıyın.`, "error");
+      return;
+    }
+    if (window.confirm(`"${tr}" birimini silmek istediğinizden emin misiniz?`)) {
+      try {
+        await deleteUnit(id);
+        setUnits(units.filter(u => u.id !== id));
+        showNotification("Birim başarıyla silindi.");
+        if (editingUnitId === id) resetUnitForm();
+      } catch (err) {
+        console.error(err);
+        showNotification("Birim silinirken bir hata oluştu.", "error");
+      }
+    }
+  };
+
   // Filtering
   const filteredDoctors = doctors.filter(doc =>
     doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -398,6 +464,11 @@ export default function AdminPanel({
   const filteredNews = newsRows.filter(n =>
     n.name_tr.toLowerCase().includes(searchNewsTerm.toLowerCase()) ||
     n.designation_tr.toLowerCase().includes(searchNewsTerm.toLowerCase())
+  );
+
+  const filteredUnits = units.filter(u =>
+    u.tr.toLowerCase().includes(searchUnitTerm.toLowerCase()) ||
+    u.en.toLowerCase().includes(searchUnitTerm.toLowerCase())
   );
 
   return (
@@ -511,6 +582,17 @@ export default function AdminPanel({
           >
             <Newspaper className="h-4 w-4" />
             <span>Haber Yönetimi</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("units")}
+            className={`pb-4 text-xs font-black uppercase tracking-wider transition-all flex items-center space-x-2 cursor-pointer ${
+              activeTab === "units"
+                ? "border-b-2 border-primary text-primary"
+                : "text-slate-400 hover:text-primary"
+            }`}
+          >
+            <Stethoscope className="h-4 w-4" />
+            <span>Birim Yönetimi</span>
           </button>
           <button
             onClick={() => setActiveTab("settings")}
@@ -682,7 +764,7 @@ export default function AdminPanel({
                             <select
                               value={docSpec.tr}
                               onChange={(e) => {
-                                const u = findUnitByTr(e.target.value);
+                                const u = units.find((x) => x.tr === e.target.value);
                                 if (u) {
                                   setDocCategory(u.type);
                                   setDocSpec({ tr: u.tr, en: u.en, ar: u.ar, ru: u.ru, ka: u.ka });
@@ -1149,6 +1231,132 @@ export default function AdminPanel({
                       </button>
                     </div>
                   </form>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB: UNITS MANAGEMENT */}
+          {activeTab === "units" && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+              {/* Units List (Left) */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xs">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-black text-primary uppercase tracking-wider">Birimler ({units.length})</h3>
+                    <div className="relative">
+                      <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Birim ara..."
+                        value={searchUnitTerm}
+                        onChange={(e) => setSearchUnitTerm(e.target.value)}
+                        className="bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-xs font-semibold text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+                    {filteredUnits.length > 0 ? (
+                      filteredUnits.map((u) => (
+                        <div key={u.id} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-1 rounded-md shrink-0 ${
+                              u.type === "surgical"
+                                ? "bg-orange-50 text-orange-600 border border-orange-200"
+                                : "bg-sky-50 text-sky-600 border border-sky-200"
+                            }`}>
+                              {u.type === "surgical" ? "Cerrahi" : "Dahili"}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-xs font-black text-primary truncate">{u.tr}</p>
+                              <p className="text-[10px] text-neutral-400 font-bold truncate">{u.en}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => handleEditUnit(u)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:bg-white hover:text-primary transition-colors cursor-pointer"
+                              title="Düzenle"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUnit(u.id, u.tr)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:bg-white hover:text-red-500 transition-colors cursor-pointer"
+                              title="Sil"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="py-12 text-center text-slate-400 font-semibold text-sm">Birim bulunamadı.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Unit Form (Right) */}
+              <div className="lg:col-span-5">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xs sticky top-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-black text-primary uppercase tracking-wider">
+                      {editingUnitId ? "Birim Düzenle" : "Yeni Birim Ekle"}
+                    </h3>
+                    {editingUnitId && (
+                      <button
+                        onClick={resetUnitForm}
+                        className="text-[10px] font-black text-slate-400 hover:text-primary uppercase tracking-wider cursor-pointer"
+                      >
+                        Vazgeç
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-[10px] font-black text-primary uppercase tracking-wider mb-1.5">Tip</label>
+                      <select
+                        value={unitForm.type}
+                        onChange={(e) => setUnitForm({ ...unitForm, type: e.target.value as UnitType })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary text-primary"
+                      >
+                        <option value="surgical">Cerrahi</option>
+                        <option value="internal">Dahili</option>
+                      </select>
+                    </div>
+                    {([
+                      ["tr", "Türkçe (TR)", "Kardiyoloji Polikliniği"],
+                      ["en", "İngilizce (EN)", "Cardiology"],
+                      ["ar", "Arapça (AR)", "أمراض القلب"],
+                      ["ru", "Rusça (RU)", "Кардиология"],
+                      ["ka", "Gürcüce (KA)", "კარდიოლოგია"],
+                    ] as const).map(([key, label, ph]) => (
+                      <div key={key}>
+                        <label className="block text-[9px] font-bold text-slate-400 mb-1">{label} *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder={ph}
+                          value={unitForm[key]}
+                          onChange={(e) => setUnitForm({ ...unitForm, [key]: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleSaveUnit}
+                      disabled={savingUnit}
+                      className="w-full bg-primary text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider mt-2 transition-all cursor-pointer hover:bg-primary/95 disabled:opacity-60 flex items-center justify-center gap-2"
+                    >
+                      {savingUnit ? "Kaydediliyor..." : editingUnitId ? "Birimi Güncelle" : "Birim Ekle"}
+                    </button>
+                  </div>
                 </div>
               </div>
 

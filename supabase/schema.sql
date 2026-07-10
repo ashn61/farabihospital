@@ -51,15 +51,33 @@ create table if not exists public.news (
   updated_at      timestamptz not null default now()
 );
 
+-- Units (Birimler) ----------------------------------------------------
+create table if not exists public.units (
+  id          uuid primary key default gen_random_uuid(),
+  tr          text not null,
+  en          text not null,
+  ar          text not null,
+  ru          text not null,
+  ka          text not null,
+  type        text not null check (type in ('surgical','internal')),
+  sort_order  integer not null default 0,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
 -- Row Level Security: public READ, writes only via service role --------
 alter table public.doctors enable row level security;
 alter table public.news    enable row level security;
+alter table public.units   enable row level security;
 
 drop policy if exists "public read doctors" on public.doctors;
 create policy "public read doctors" on public.doctors for select using (true);
 
 drop policy if exists "public read news" on public.news;
 create policy "public read news" on public.news for select using (true);
+
+drop policy if exists "public read units" on public.units;
+create policy "public read units" on public.units for select using (true);
 -- (No insert/update/delete policies: the service-role key bypasses RLS;
 --  the anon key therefore cannot write.)
 

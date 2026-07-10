@@ -23,7 +23,7 @@ import ChatWidget from "@/components/shared/ChatWidget";
 import { doctorsData, formatDoctorName } from "@/lib/doctors";
 import { newsData } from "@/lib/news";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
-import { units, unitLabel } from "@/lib/units";
+import { unitLabel, type Unit } from "@/lib/units";
 
 const translations = {
   tr: {
@@ -263,15 +263,14 @@ const translations = {
   }
 };
 
-const surgicalSpecialties = units.filter((u) => u.type === "surgical");
-const internalSpecialties = units.filter((u) => u.type === "internal");
-
 export default function HomeClient({
   initialDoctors,
   initialNews,
+  initialUnits,
 }: {
   initialDoctors: typeof doctorsData;
   initialNews: typeof newsData;
+  initialUnits: Unit[];
 }) {
   const [locale, setLocale] = useState<Locale>("tr");
 
@@ -280,6 +279,9 @@ export default function HomeClient({
   }, [locale]);
   const [doctors, setDoctors] = useState<typeof doctorsData>(initialDoctors);
   const [news, setNews] = useState<typeof newsData>(initialNews);
+
+  const surgicalSpecialties = initialUnits.filter((u) => u.type === "surgical");
+  const internalSpecialties = initialUnits.filter((u) => u.type === "internal");
 
   const activeNews = news[locale] || [];
 
