@@ -23,6 +23,7 @@ import ChatWidget from "@/components/shared/ChatWidget";
 import { doctorsData, formatDoctorName } from "@/lib/doctors";
 import { newsData } from "@/lib/news";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
+import { units, unitLabel } from "@/lib/units";
 
 const translations = {
   tr: {
@@ -262,28 +263,8 @@ const translations = {
   }
 };
 
-const surgicalSpecialties = [
-  { tr: "Göğüs Cerrahisi", en: "Thoracic Surgery", ru: "Торакальная хирургия", ka: "თორაკალური ქირურგია" },
-  { tr: "Genel Cerrahi", en: "General Surgery", ru: "Общая хирургия", ka: "ზოგადი ქირურგია" },
-  { tr: "Kalp ve Damar Cerrahisi", en: "Cardiovascular Surgery", ru: "Сердечно-сосудистая хирургия", ka: "კარდიოვასკულური ქირურგია" },
-  { tr: "Plastik, Rekonstrüktif ve Estetik Cerrahi", en: "Plastic & Reconstructive Surgery", ru: "Пластическая хирургия", ka: "პლასტიკური ქირურგია" },
-  { tr: "Beyin ve Sinir Cerrahisi", en: "Neurosurgery", ru: "Нейрохирургия", ka: "ნეიროქირურგია" },
-  { tr: "Göz Hastalıkları", en: "Ophthalmology", ru: "Офтальмология", ka: "ოფთალმოლოგია" },
-  { tr: "Üroloji", en: "Urology", ru: "Урология", ka: "უროლოგია" },
-  { tr: "Kulak Burun Boğaz (KBB)", en: "Otorhinolaryngology (ENT)", ru: "Оториноларингология (ЛОР)", ka: "ყელ-ყურ-ცხვირი (KBB)" },
-  { tr: "Çocuk Cerrahisi", en: "Pediatric Surgery", ru: "Детская хирургия", ka: "ბავშვთა ქირურგია" }
-];
-
-const internalSpecialties = [
-  { tr: "Çocuk Sağlığı ve Hastalıkları", en: "Pediatric Health & Diseases", ru: "Педиатрия", ka: "ბავშვთა სნეულებანი" },
-  { tr: "Kardiyoloji", en: "Cardiology", ru: "Кардиология", ka: "კარდიოლოგია" },
-  { tr: "Çocuk Hematolojisi & Onkolojisi", en: "Pediatric Hematology & Oncology", ru: "Детская гематология и онкология", ka: "ბავშვთა ჰემატო-ონკოლოგია" },
-  { tr: "Dermatoloji", en: "Dermatology", ru: "Дерматология", ka: "დერმატოლოგია" },
-  { tr: "Tıbbi Genetik", en: "Medical Genetics", ru: "Медицинская генетика", ka: "სამედიცინო გენეტიკა" },
-  { tr: "Gastroenteroloji", en: "Gastroenterology", ru: "Гастроэнтерология", ka: "გასტროენტეროლოგია" },
-  { tr: "Enfeksiyon Hastalıkları", en: "Infectious Diseases", ru: "Инфекционные болезни", ka: "ინფექციური დაავადებები" },
-  { tr: "Göğüs Hastalıkları", en: "Pulmonary Diseases", ru: "Пульмонология", ka: "ფილტვის დაავადებები" }
-];
+const surgicalSpecialties = units.filter((u) => u.type === "surgical");
+const internalSpecialties = units.filter((u) => u.type === "internal");
 
 export default function HomeClient({
   initialDoctors,
@@ -480,7 +461,7 @@ export default function HomeClient({
                         </div>
                         <div className="text-left">
                           <p className="text-xs font-black text-primary leading-tight">
-                            {locale === "tr" ? spec.tr : locale === "en" ? spec.en : locale === "ru" ? spec.ru : spec.ka}
+                            {unitLabel(spec, locale)}
                           </p>
                           <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-0.5">
                             Cerrahi Birim
@@ -521,7 +502,7 @@ export default function HomeClient({
                         </div>
                         <div className="text-left">
                           <p className="text-xs font-black text-primary leading-tight">
-                            {locale === "tr" ? spec.tr : locale === "en" ? spec.en : locale === "ru" ? spec.ru : spec.ka}
+                            {unitLabel(spec, locale)}
                           </p>
                           <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-0.5">
                             Dahili Birim
