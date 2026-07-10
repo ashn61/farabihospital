@@ -15,6 +15,7 @@ import Footer from "@/components/shared/Footer";
 import ChatWidget from "@/components/shared/ChatWidget";
 import { formatDoctorName } from "@/lib/doctors";
 import type { Doctor } from "@/lib/doctors";
+import { readStoredLocale, storeLocale } from "@/lib/locale";
 
 const translations = {
   tr: {
@@ -102,6 +103,12 @@ const translations = {
 export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
   const [locale, setLocale] = useState<Locale>("tr");
 
+  // Restore the language the user picked on any previous page/visit.
+  useEffect(() => {
+    const stored = readStoredLocale();
+    if (stored) setLocale(stored);
+  }, []);
+
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
@@ -114,7 +121,7 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
       <div className="flex flex-col min-h-screen bg-background" style={{ direction: isRtl ? "rtl" : "ltr" }}>
         <Navbar
           currentLocale={locale}
-          onLocaleChange={(l) => setLocale(l)}
+          onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
         />
         <main className="flex-1 max-w-3xl mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
           <div className="p-4 bg-red-50 text-red-500 rounded-full mb-6">
@@ -162,7 +169,7 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
       {/* Global Navbar */}
       <Navbar
         currentLocale={locale}
-        onLocaleChange={(l) => setLocale(l)}
+        onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
       />
 
       <main className="flex-1 pt-32 pb-24 max-w-7xl mx-auto px-6 w-full">

@@ -25,6 +25,7 @@ import { doctorsData, formatDoctorName } from "@/lib/doctors";
 import { newsData } from "@/lib/news";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
 import { unitLabel, type Unit } from "@/lib/units";
+import { readStoredLocale, storeLocale } from "@/lib/locale";
 
 const translations = {
   tr: {
@@ -275,6 +276,12 @@ export default function HomeClient({
 }) {
   const [locale, setLocale] = useState<Locale>("tr");
 
+  // Restore the language the user picked on any previous page/visit.
+  useEffect(() => {
+    const stored = readStoredLocale();
+    if (stored) setLocale(stored);
+  }, []);
+
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
@@ -323,7 +330,7 @@ export default function HomeClient({
       {/* Global Navigation Header */}
       <Navbar
         currentLocale={locale}
-        onLocaleChange={(l) => setLocale(l)}
+        onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
       />
 
       {/* Hero section */}
