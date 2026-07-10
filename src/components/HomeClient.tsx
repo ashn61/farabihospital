@@ -14,7 +14,8 @@ import {
   MapPin,
   Sparkles,
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  X
 } from "lucide-react";
 import Navbar, { Locale } from "@/components/shared/Navbar";
 import Hero from "@/components/sections/Hero";
@@ -288,6 +289,7 @@ export default function HomeClient({
   // Doctors filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<"all" | "surgical" | "internal">("all");
+  const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 
   // Specialties active tab state
   const [specialtiesTab, setSpecialtiesTab] = useState<"surgical" | "internal">("surgical");
@@ -301,6 +303,8 @@ export default function HomeClient({
   const filteredDoctors = doctors.filter((doc) => {
     const matchesCategory = activeCategory === "all" || doc.category === activeCategory;
 
+    const matchesUnit = !selectedUnit || doc.specialtyTr === selectedUnit;
+
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
       doc.name.toLowerCase().includes(searchLower) ||
@@ -309,8 +313,10 @@ export default function HomeClient({
       doc.specialtyRu.toLowerCase().includes(searchLower) ||
       doc.specialtyKa.toLowerCase().includes(searchLower);
 
-    return matchesCategory && matchesSearch;
+    return matchesCategory && matchesUnit && matchesSearch;
   });
+
+  const selectedUnitObj = selectedUnit ? initialUnits.find((u) => u.tr === selectedUnit) : null;
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background" style={{ direction: isRtl ? "rtl" : "ltr" }}>
@@ -473,8 +479,9 @@ export default function HomeClient({
                       <a
                         href="#doctors"
                         onClick={() => {
-                          setSearchQuery(spec.tr);
-                          setActiveCategory("surgical");
+                          setSelectedUnit(spec.tr);
+                          setSearchQuery("");
+                          setActiveCategory(spec.type);
                         }}
                         className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-primary transition-colors"
                       >
@@ -514,8 +521,9 @@ export default function HomeClient({
                       <a
                         href="#doctors"
                         onClick={() => {
-                          setSearchQuery(spec.tr);
-                          setActiveCategory("internal");
+                          setSelectedUnit(spec.tr);
+                          setSearchQuery("");
+                          setActiveCategory(spec.type);
                         }}
                         className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-primary transition-colors"
                       >
@@ -550,7 +558,7 @@ export default function HomeClient({
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setSelectedUnit(null); }}
                 placeholder={t.searchPlaceholder}
                 className="w-full pl-12 pr-4 py-3.5 bg-white border border-neutral-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none rounded-2xl text-xs font-bold transition-all shadow-2xs"
               />
@@ -559,7 +567,7 @@ export default function HomeClient({
             {/* Specialty category selectors */}
             <div className="flex flex-wrap gap-2 items-center bg-slate-100 p-1.5 rounded-2xl">
               <button
-                onClick={() => setActiveCategory("all")}
+                onClick={() => { setActiveCategory("all"); setSelectedUnit(null); }}
                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeCategory === "all"
                   ? "bg-primary text-white shadow-xs"
                   : "text-slate-500 hover:text-primary"
@@ -568,7 +576,7 @@ export default function HomeClient({
                 {t.allCategories}
               </button>
               <button
-                onClick={() => setActiveCategory("surgical")}
+                onClick={() => { setActiveCategory("surgical"); setSelectedUnit(null); }}
                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeCategory === "surgical"
                   ? "bg-primary text-white shadow-xs"
                   : "text-slate-500 hover:text-primary"
@@ -577,7 +585,7 @@ export default function HomeClient({
                 {t.filterSurgical}
               </button>
               <button
-                onClick={() => setActiveCategory("internal")}
+                onClick={() => { setActiveCategory("internal"); setSelectedUnit(null); }}
                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeCategory === "internal"
                   ? "bg-primary text-white shadow-xs"
                   : "text-slate-500 hover:text-primary"
@@ -587,6 +595,22 @@ export default function HomeClient({
               </button>
             </div>
           </div>
+
+          {/* Active unit filter chip */}
+          {selectedUnitObj && (
+            <div className="max-w-4xl mx-auto -mt-6 mb-10 flex justify-center">
+              <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/20 text-primary rounded-full pl-4 pr-2 py-1.5">
+                <span className="text-[11px] font-black">{unitLabel(selectedUnitObj, locale)}</span>
+                <button
+                  onClick={() => setSelectedUnit(null)}
+                  className="p-1 rounded-full hover:bg-primary/10 transition-colors cursor-pointer"
+                  aria-label="Birim filtresini kaldır"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Doctors Grid with Animation */}
           <motion.div
@@ -630,9 +654,6 @@ export default function HomeClient({
                           <div className="flex items-center justify-between">
                             <span className="text-[9px] font-black text-secondary uppercase tracking-widest">
                               {doc.category === "surgical" ? t.filterSurgical : t.filterInternal}
-                            </span>
-                            <span className="text-[9px] text-neutral-400 font-bold">
-                              {doc.stats.experience} {t.experienceYears}
                             </span>
                           </div>
                           <h4 className="text-sm font-black text-primary leading-tight mt-1 truncate">

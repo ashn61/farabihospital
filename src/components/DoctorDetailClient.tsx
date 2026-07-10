@@ -213,13 +213,7 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
             </div>
 
             {/* Core Metrics Ribbon Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="glass-panel border rounded-2xl p-4 shadow-2xs">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.experienceTitle}</p>
-                <p className="text-xl sm:text-2xl font-black text-primary mt-1">
-                  {doctor.stats.experience} <span className="text-xs font-semibold text-neutral-400">{t.experienceVal}</span>
-                </p>
-              </div>
+            <div className="grid grid-cols-1 gap-4">
               <div className="glass-panel border rounded-2xl p-4 shadow-2xs">
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.surgeriesTitle}</p>
                 <p className="text-xl sm:text-2xl font-black text-primary mt-1">
