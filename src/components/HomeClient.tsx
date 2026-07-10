@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -50,7 +50,6 @@ const translations = {
     noDoctorsFound: "Arama kriterlerine uygun hekim bulunamadı.",
     doctorDetailsBtn: "Detaylı Profil",
     experienceYears: "Yıl Deneyim",
-    patientsHealed: "Hasta Memnuniyeti",
 
     announcementsTitle: "Haberler & Başarılar",
     announcementsSubtitle: "Hastanemizde Gerçekleştirilen Başarılı Operasyonlar",
@@ -98,7 +97,6 @@ const translations = {
     noDoctorsFound: "No physicians match your search criteria.",
     doctorDetailsBtn: "Detailed Profile",
     experienceYears: "Years Exp",
-    patientsHealed: "Patient Satisfaction",
 
     announcementsTitle: "News & Successes",
     announcementsSubtitle: "Successful Medical Operations Performed at KTÜ Farabi",
@@ -146,7 +144,6 @@ const translations = {
     noDoctorsFound: "لم يتم العثور على أطباء يطابقون معايير البحث.",
     doctorDetailsBtn: "الملف التفصيلي",
     experienceYears: "سنة خبرة",
-    patientsHealed: "رضا المرضى",
 
     announcementsTitle: "الأخبار والإنجازات",
     announcementsSubtitle: "العمليات الجراحية الناجحة التي أجريت في مستشفانا",
@@ -194,7 +191,6 @@ const translations = {
     noDoctorsFound: "Врачи, соответствующие критериям поиска, не найдены.",
     doctorDetailsBtn: "Подробный профиль",
     experienceYears: "лет опыта",
-    patientsHealed: "Удовлетворенность пациентов",
 
     announcementsTitle: "Новости и достижения",
     announcementsSubtitle: "Успешные медицинские операции, проведенные в клинике",
@@ -242,7 +238,6 @@ const translations = {
     noDoctorsFound: "ექიმები მითითებული კრიტერიუმით ვერ მოიძებნა.",
     doctorDetailsBtn: "დეტალური პროფილი",
     experienceYears: "წლის გამოცდილება",
-    patientsHealed: "პაციენტთა კმაყოფილება",
 
     announcementsTitle: "სიახლეები და მიღწევები",
     announcementsSubtitle: "ჩვენს კლინიკაში ჩატარებული წარმატებული ოპერაციები",
@@ -298,6 +293,10 @@ export default function HomeClient({
   initialNews: typeof newsData;
 }) {
   const [locale, setLocale] = useState<Locale>("tr");
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
   const [doctors, setDoctors] = useState<typeof doctorsData>(initialDoctors);
   const [news, setNews] = useState<typeof newsData>(initialNews);
 
@@ -662,15 +661,7 @@ export default function HomeClient({
                         </div>
 
                         {/* Direct Link to detail pages */}
-                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <span className="text-[8px] text-slate-400 font-black uppercase tracking-wider">
-                              {t.patientsHealed}
-                            </span>
-                            <span className="text-[11px] font-extrabold text-primary">
-                              99.8%
-                            </span>
-                          </div>
+                        <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
                           <Link
                             href={`/doctors/${doc.id}`}
                             className="flex items-center space-x-1.5 px-4 py-2 bg-primary text-white hover:bg-primary/95 text-[10px] font-extrabold rounded-full transition-all cursor-pointer shadow-2xs hover:shadow-xs"

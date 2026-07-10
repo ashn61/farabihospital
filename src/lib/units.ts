@@ -76,5 +76,16 @@ export function findUnitByTr(tr: string): Unit | undefined {
 }
 
 export function unitLabel(u: Unit, locale: string): string {
-  return (u as Record<string, string>)[locale] ?? u.tr;
+  switch (locale) {
+    case "en":
+      return u.en;
+    case "ar":
+      return u.ar;
+    case "ru":
+      return u.ru;
+    case "ka":
+      return u.ka;
+    default:
+      return u.tr;
+  }
 }

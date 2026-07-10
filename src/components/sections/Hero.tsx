@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, Variants } from "framer-motion";
-import { Users, HeartHandshake, ShieldCheck, ArrowDown } from "lucide-react";
+import { Users, ShieldCheck, ArrowDown } from "lucide-react";
 import { Locale } from "../shared/Navbar";
 
 const translations = {
@@ -266,20 +266,6 @@ export default function Hero({ currentLocale }: HeroProps) {
                   <p className="text-sm font-extrabold text-primary">Prof. Dr. Celal TEKİNBAŞ</p>
                 </div>
               </div>
-            </div>
-          </motion.div>
-
-          {/* Small Floating Micro-Badge */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="absolute -top-4 -left-4 glass-panel border border-primary/20 rounded-2xl p-3 shadow-lg flex items-center space-x-2.5 z-20 cursor-default"
-          >
-            <div className="p-2 bg-secondary rounded-lg text-primary">
-              <HeartHandshake className="h-4.5 w-4.5 text-primary" />
-            </div>
-            <div className="text-left">
-              <p className="text-[9px] font-extrabold text-neutral-400">MÜKEMMELLİK MERKEZİ</p>
-              <p className="text-[11px] font-black text-primary">99.8% Hasta Memnuniyeti</p>
             </div>
           </motion.div>
         </motion.div>

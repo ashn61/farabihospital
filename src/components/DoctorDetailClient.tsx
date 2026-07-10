@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -23,7 +23,6 @@ const translations = {
     notFoundDesc: "Aradığınız hekim sistemimizde kayıtlı bulunmamaktadır. Lütfen dizine geri dönerek arama yapınız.",
     academicStats: "Akademik Göstergeler",
     experienceTitle: "Klinik Deneyim",
-    patientsTitle: "Memnuniyet Oranı",
     surgeriesTitle: "Gerçekleşen Ameliyat",
     experienceVal: "Yıl",
     surgeriesVal: "Operasyon",
@@ -40,7 +39,6 @@ const translations = {
     notFoundDesc: "The requested doctor could not be found in our database. Please return to the directory.",
     academicStats: "Academic Performance",
     experienceTitle: "Clinical Experience",
-    patientsTitle: "Satisfaction Rate",
     surgeriesTitle: "Completed Surgeries",
     experienceVal: "Years",
     surgeriesVal: "Operations",
@@ -57,7 +55,6 @@ const translations = {
     notFoundDesc: "لم يتم العثور على الطبيب المطلوب في قاعدة بياناتنا. يرجى العودة إلى الدليل.",
     academicStats: "المؤشرات الأكاديمية",
     experienceTitle: "الخبرة السريرية",
-    patientsTitle: "نسبة رضا المرضى",
     surgeriesTitle: "عمليات جراحية ناجحة",
     experienceVal: "سنة",
     surgeriesVal: "عملية",
@@ -74,7 +71,6 @@ const translations = {
     notFoundDesc: "Запрашиваемый специалист не найден в нашей базе данных. Пожалуйста, вернитесь к каталогу.",
     academicStats: "Академические показатели",
     experienceTitle: "Клинический опыт",
-    patientsTitle: "Уровень удовлетворенности",
     surgeriesTitle: "Проведено операций",
     experienceVal: "лет",
     surgeriesVal: "операций",
@@ -91,7 +87,6 @@ const translations = {
     notFoundDesc: "მოთხოვნილი ექიმი ჩვენს ბაზაში ვერ მოიძებნა. გთხოვთ, დაბრუნდეთ კატალოგში.",
     academicStats: "აკადემიური მაჩვენებლები",
     experienceTitle: "კლინიკური გამოცდილება",
-    patientsTitle: "კმაყოფილების მაჩვენებელი",
     surgeriesTitle: "ჩატარებული ოპერაციები",
     experienceVal: "წელი",
     surgeriesVal: "ოპერაცია",
@@ -106,6 +101,10 @@ const translations = {
 
 export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
   const [locale, setLocale] = useState<Locale>("tr");
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const t = translations[locale];
   const isRtl = locale === "ar";
@@ -214,17 +213,11 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
             </div>
 
             {/* Core Metrics Ribbon Cards */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="glass-panel border rounded-2xl p-4 shadow-2xs">
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.experienceTitle}</p>
                 <p className="text-xl sm:text-2xl font-black text-primary mt-1">
                   {doctor.stats.experience} <span className="text-xs font-semibold text-neutral-400">{t.experienceVal}</span>
-                </p>
-              </div>
-              <div className="glass-panel border rounded-2xl p-4 shadow-2xs">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.patientsTitle}</p>
-                <p className="text-xl sm:text-2xl font-black text-primary mt-1">
-                  99.8%
                 </p>
               </div>
               <div className="glass-panel border rounded-2xl p-4 shadow-2xs">
