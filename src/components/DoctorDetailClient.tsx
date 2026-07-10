@@ -212,17 +212,6 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
               </p>
             </div>
 
-            {/* Core Metrics Ribbon Cards */}
-            <div className="grid grid-cols-1 gap-4">
-              <div className="glass-panel border rounded-2xl p-4 shadow-2xs">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.surgeriesTitle}</p>
-                <p className="text-xl sm:text-2xl font-black text-primary mt-1">
-                  {doctor.stats.surgeries ? doctor.stats.surgeries : "1200"}+
-                  <span className="text-xs font-semibold text-neutral-400"> {t.surgeriesVal}</span>
-                </p>
-              </div>
-            </div>
-
             {/* Info warning */}
             <div className="p-4 bg-secondary/10 border border-secondary/20 rounded-2xl flex gap-3">
               <CheckCircle2 className="h-5 w-5 text-secondary shrink-0 mt-0.5" />
