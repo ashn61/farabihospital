@@ -36,6 +36,9 @@ const MAP: Record<string, string> = {
   "Enfeksiyon Hastalıkları": "Enfeksiyon Polikliniği",
   "Genel Cerrahi (Meme & Endokrin)": "Genel Cerrahi Polikliniği",
   "Kadın Hastalıkları ve Doğum & IVF": "Kadın-Doğum Polikliniği",
+  // DB'de admin'den düzenlenmiş/eklenmiş kayıtlar:
+  "Çocuk Hematoloji": "Pediatri Hematoloji ve Onkoloji Polikliniği",
+  "Medikal Onkoloji(Kemoterapi)": "Medikal Onkoloji Polikliniği",
 };
 
 const supabase = createClient(
