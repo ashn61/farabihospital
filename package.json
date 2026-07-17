@@ -10,8 +10,7 @@
     "test": "vitest run",
     "seed": "tsx scripts/seed.ts",
     "fix:ru-dr": "tsx scripts/fix-ru-dr.ts",
-    "create:doctor-units": "tsx scripts/create-doctor-units-table.ts",
-    "migrate:doctor-units": "tsx scripts/migrate-doctor-units.ts"
+    "create:doctor-units": "tsx scripts/create-doctor-units-table.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
