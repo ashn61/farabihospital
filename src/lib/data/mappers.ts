@@ -1,4 +1,4 @@
-import { isSurgical, type Doctor } from "@/lib/doctors";
+import type { Doctor } from "@/lib/doctors";
 import type { NewsItem, NewsData } from "@/lib/news";
 import type { UnitRecord } from "@/lib/units";
 import type { Locale } from "@/lib/locale";
@@ -8,9 +8,6 @@ export interface DoctorRow {
   name: string;
   title: string;
   image: string;
-  stats_patients: number;
-  stats_experience: number;
-  stats_surgeries: number | null;
   email: string;
   education_tr: string[];
   education_en: string[];
@@ -67,11 +64,6 @@ export function rowToDoctor(row: DoctorRow): Doctor {
     title: row.title,
     image: row.image,
     units,
-    stats: {
-      patients: row.stats_patients,
-      experience: row.stats_experience,
-      surgeries: row.stats_surgeries ?? undefined,
-    },
     email: row.email,
     educationTr: row.education_tr ?? [],
     educationEn: row.education_en ?? [],
@@ -94,9 +86,6 @@ export function doctorToRow(doc: Doctor, sortOrder = 0): Omit<DoctorRow, "doctor
     name: doc.name,
     title: doc.title,
     image: doc.image,
-    stats_patients: doc.stats.patients,
-    stats_experience: doc.stats.experience,
-    stats_surgeries: isSurgical(doc) ? doc.stats.surgeries ?? null : null,
     email: doc.email,
     education_tr: doc.educationTr ?? [],
     education_en: doc.educationEn ?? [],

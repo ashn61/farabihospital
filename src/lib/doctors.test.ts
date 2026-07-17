@@ -80,7 +80,6 @@ function makeDoctor(units: UnitRecord[]): Doctor {
   return {
     id: "x1", name: "Prof. Dr. Test HEKİM", title: "Prof. Dr.", image: "/x.jpg",
     units,
-    stats: { patients: 100, experience: 10, surgeries: 5 },
     email: "t@ktu.edu.tr",
     educationTr: [], educationEn: [],
     bioTr: "", bioEn: "", bioRu: "", bioKa: "",

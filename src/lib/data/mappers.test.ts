@@ -29,9 +29,6 @@ const sampleRow: DoctorRow = {
   name: "Celal TEKİNBAŞ",
   title: "Prof. Dr.",
   image: "/assets/doctors/celal_tekinbas.jpg",
-  stats_patients: 14200,
-  stats_experience: 28,
-  stats_surgeries: 4500,
   email: "celal@ktu.edu.tr",
   education_tr: ["KTÜ"],
   education_en: ["KTU"],
@@ -45,7 +42,6 @@ describe("rowToDoctor", () => {
   it("maps snake_case columns into the Doctor shape", () => {
     const doc = rowToDoctor(sampleRow);
     expect(doc.id).toBe("4177");
-    expect(doc.stats).toEqual({ patients: 14200, experience: 28, surgeries: 4500 });
     expect(doc.educationTr).toEqual(["KTÜ"]);
   });
 
@@ -84,33 +80,8 @@ describe("doctorToRow", () => {
     const doc: Doctor = rowToDoctor(sampleRow);
     const row = doctorToRow(doc, 5);
     expect(row.name).toBe("Celal TEKİNBAŞ");
-    expect(row.stats_surgeries).toBe(4500);
     expect(row.sort_order).toBe(5);
     expect(row.bio_ar).toBeNull();
-  });
-
-  it("sets stats_surgeries to null for a doctor with no surgical unit", () => {
-    const doc = rowToDoctor({
-      ...sampleRow,
-      stats_surgeries: null,
-      doctor_units: [{ units: internalUnitRow }],
-    });
-    const row = doctorToRow(doc);
-    expect(row.stats_surgeries).toBeNull();
-  });
-
-  it("keeps stats_surgeries when at least one unit is surgical", () => {
-    const doc = rowToDoctor({
-      ...sampleRow,
-      doctor_units: [{ units: internalUnitRow }, { units: surgicalUnitRow }],
-    });
-    expect(doctorToRow(doc).stats_surgeries).toBe(4500);
-  });
-
-  it("writes null stats_surgeries for a surgical doctor with no surgeries value", () => {
-    const doc = rowToDoctor({ ...sampleRow, stats_surgeries: null }); // surgical, surgeries undefined
-    const row = doctorToRow(doc);
-    expect(row.stats_surgeries).toBeNull();
   });
 });
 

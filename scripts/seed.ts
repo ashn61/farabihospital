@@ -33,7 +33,6 @@ async function seedDoctors() {
     });
 
   // doctorToRow bir Doctor bekliyor; DoctorSeed'i çözülmüş birimlerle Doctor'a yükseltiyoruz.
-  // Birimler doğru geçmeli — doctorToRow stats_surgeries'i isSurgical üzerinden hesaplıyor.
   const rows = doctorsData.map((doc, i) =>
     doctorToRow({ ...doc, units: resolveUnits(doc.unitTr, doc.name) }, i)
   );

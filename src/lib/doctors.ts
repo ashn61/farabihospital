@@ -87,11 +87,6 @@ export interface Doctor {
   image: string;
   /** Hekimin branşları. Ad ve çeviriler yalnızca burada — units tablosundan gelir. */
   units: UnitRecord[];
-  stats: {
-    patients: number;
-    surgeries?: number;
-    experience: number;
-  };
   email: string;
   educationTr: string[];
   educationEn: string[];
@@ -123,7 +118,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/celal_tekinbas.jpg",
     unitTr: ["Göğüs Cerrahisi Polikliniği"],
-    stats: { patients: 14200, surgeries: 4500, experience: 28 },
     email: "celal.tekinbas@ktu.edu.tr",
     educationTr: [
       "Karadeniz Teknik Üniversitesi Tıp Fakültesi (Lisans)",
@@ -149,7 +143,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/aysenur_bahadir.jpg",
     unitTr: ["Genel Pediatri Polikliniği"],
-    stats: { patients: 9800, experience: 16 },
     email: "aysenur.bahadir@ktu.edu.tr",
     educationTr: [
       "Hacettepe Üniversitesi Tıp Fakültesi",
@@ -175,7 +168,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/bircan_sonmez.jpg",
     unitTr: ["Pediatri Hematoloji ve Onkoloji Polikliniği"],
-    stats: { patients: 5400, experience: 14 },
     email: "bircan.sonmez@ktu.edu.tr",
     educationTr: [
       "Ege Üniversitesi Tıp Fakültesi",
@@ -196,7 +188,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/deniz_aksu_arica.jpg",
     unitTr: ["Cildiye Polikliniği"],
-    stats: { patients: 11200, experience: 15 },
     email: "deniz.arica@ktu.edu.tr",
     educationTr: [
       "Ankara Üniversitesi Tıp Fakültesi",
@@ -217,7 +208,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/elif_acar_arslan.png",
     unitTr: ["Pediatri Nöroloji Polikliniği"],
-    stats: { patients: 7600, experience: 14 },
     email: "elif.acar@ktu.edu.tr",
     educationTr: [
       "Atatürk Üniversitesi Tıp Fakültesi",
@@ -240,7 +230,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/bengu_cobanoglu.jpg",
     unitTr: ["Kulak-Burun-Boğaz Polikliniği"],
-    stats: { patients: 8400, surgeries: 1900, experience: 13 },
     email: "bengu.cobanoglu@ktu.edu.tr",
     educationTr: [
       "İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi",
@@ -261,7 +250,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/selcuk_arslan.jpg",
     unitTr: ["Tıbbi Genetik Polikliniği"],
-    stats: { patients: 4800, experience: 12 },
     email: "selcuk.arslan@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -282,7 +270,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/onur_kazaz.png",
     unitTr: ["Üroloji Polikliniği"],
-    stats: { patients: 9200, surgeries: 2600, experience: 15 },
     email: "onur.kazaz@ktu.edu.tr",
     educationTr: [
       "Hacettepe Üniversitesi Tıp Fakültesi",
@@ -303,7 +290,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Asst. Prof.",
     image: "/assets/doctors/fatih_colak.jpg",
     unitTr: ["Göğüs Cerrahisi Polikliniği"],
-    stats: { patients: 5100, surgeries: 1200, experience: 10 },
     email: "fatih.colak@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi (Lisans)",
@@ -324,7 +310,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Asst. Prof.",
     image: "/assets/doctors/kerim_oner.jpg",
     unitTr: ["Genel Pediatri Polikliniği"],
-    stats: { patients: 6300, experience: 9 },
     email: "kerim.oner@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -345,7 +330,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Asst. Prof.",
     image: "/assets/doctors/leyla_baykal_selcuk.png",
     unitTr: ["Cildiye Polikliniği"],
-    stats: { patients: 7800, experience: 11 },
     email: "leyla.baykal@ktu.edu.tr",
     educationTr: [
       "Hacettepe Tıp Fakültesi",
@@ -366,7 +350,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Asst. Prof.",
     image: "/assets/doctors/mursel_sahin.jpg",
     unitTr: ["Kardiyoloji Polikliniği"],
-    stats: { patients: 8200, experience: 12 },
     email: "mursel.sahin@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -387,7 +370,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Asst. Prof.",
     image: "/assets/doctors/seher_nazli_kazaz.jpg",
     unitTr: ["Göğüs Hastalıkları Polikliniği"],
-    stats: { patients: 5900, experience: 10 },
     email: "seher.kazaz@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -408,7 +390,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/abdulcemal_umit_isik.jpg",
     unitTr: ["Gastroenteroloji Polikliniği"],
-    stats: { patients: 15400, experience: 29 },
     email: "umit.isik@ktu.edu.tr",
     educationTr: [
       "Ankara Üniversitesi Tıp Fakültesi",
@@ -429,7 +410,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/adnan_calik.jpg",
     unitTr: ["Genel Cerrahi Polikliniği"],
-    stats: { patients: 12100, surgeries: 3900, experience: 27 },
     email: "adnan.calik@ktu.edu.tr",
     educationTr: [
       "İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi",
@@ -450,7 +430,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/ahmet_coskun_ozdemir.jpg",
     unitTr: ["Dahiliye Polikliniği"],
-    stats: { patients: 18900, experience: 32 },
     email: "coskun.ozdemir@ktu.edu.tr",
     educationTr: [
       "Ankara Üniversitesi Tıp Fakültesi",
@@ -471,7 +450,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/atila_turkyilmaz.jpg",
     unitTr: ["Göğüs Cerrahisi Polikliniği"],
-    stats: { patients: 11000, surgeries: 3800, experience: 24 },
     email: "atila.turkyilmaz@ktu.edu.tr",
     educationTr: [
       "Atatürk Üniversitesi Tıp Fakültesi",
@@ -492,7 +470,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/erhan_arslan.jpg",
     unitTr: ["Beyin Cerrahi Polikliniği"],
-    stats: { patients: 10400, surgeries: 3100, experience: 22 },
     email: "erhan.arslan@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -513,7 +490,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/erol_erduran.jpg",
     unitTr: ["Pediatri Hematoloji ve Onkoloji Polikliniği"],
-    stats: { patients: 13900, experience: 28 },
     email: "erol.erduran@ktu.edu.tr",
     educationTr: [
       "Hacettepe Üniversitesi Tıp Fakültesi",
@@ -534,7 +510,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/ersagun_karaguzel.jpg",
     unitTr: ["Çocuk Ürolojisi Polikliniği"],
-    stats: { patients: 9500, surgeries: 2800, experience: 19 },
     email: "ersagun.karaguzel@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -555,7 +530,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/ertugrul_cakir.png",
     unitTr: ["Beyin Cerrahi Polikliniği"],
-    stats: { patients: 11500, surgeries: 3400, experience: 25 },
     email: "ertugrul.cakir@ktu.edu.tr",
     educationTr: [
       "Ankara Tıp Fakültesi",
@@ -576,7 +550,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/fazil_orhan.jpg",
     unitTr: ["Pediatri İmmünoloji ve Alerji Polikliniği"],
-    stats: { patients: 14700, experience: 24 },
     email: "fazil.orhan@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -597,7 +570,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/hidayet_erdol.jpg",
     unitTr: ["Göz Polikliniği"],
-    stats: { patients: 17200, surgeries: 5200, experience: 28 },
     email: "hidayet.erdol@ktu.edu.tr",
     educationTr: [
       "Atatürk Üniversitesi Tıp Fakültesi",
@@ -618,7 +590,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/mehmet_sonmez.jpg",
     unitTr: ["Hematoloji Polikliniği"],
-    stats: { patients: 16100, experience: 26 },
     email: "mehmet.sonmez@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -639,7 +610,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/merih_kutlu.png",
     unitTr: ["Kardiyoloji Polikliniği"],
-    stats: { patients: 19500, experience: 30 },
     email: "merih.kutlu@ktu.edu.tr",
     educationTr: [
       "İstanbul Üniversitesi İstanbul Tıp Fakültesi",
@@ -660,7 +630,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/muhammet_uraloglu.jpg",
     unitTr: ["Plastik Cerrahi Polikliniği"],
-    stats: { patients: 8100, surgeries: 3200, experience: 18 },
     email: "muhammet.uraloglu@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -681,7 +650,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/murat_cakir.jpg",
     unitTr: ["Pediatri Gastroenteroloji Polikliniği"],
-    stats: { patients: 11200, experience: 20 },
     email: "murat.cakir@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -702,7 +670,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/murat_livaoglu.jpg",
     unitTr: ["Plastik Cerrahi Polikliniği"],
-    stats: { patients: 9800, surgeries: 3700, experience: 21 },
     email: "murat.livaoglu@ktu.edu.tr",
     educationTr: [
       "Hacettepe Üniversitesi Tıp Fakültesi",
@@ -723,7 +690,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/mustafa_imamoglu.png",
     unitTr: ["Çocuk Cerrahisi Polikliniği"],
-    stats: { patients: 13200, surgeries: 4100, experience: 26 },
     email: "mustafa.imamoglu@ktu.edu.tr",
     educationTr: [
       "Ankara Üniversitesi Tıp Fakültesi",
@@ -744,7 +710,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/omer_gedikli.jpg",
     unitTr: ["Kulak-Burun-Boğaz Polikliniği"],
-    stats: { patients: 14000, surgeries: 3900, experience: 23 },
     email: "omer.gedikli@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -765,7 +730,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Assoc. Prof.",
     image: "/assets/doctors/selcuk_arslan.jpg",
     unitTr: ["Tıbbi Genetik Polikliniği"],
-    stats: { patients: 4800, experience: 12 },
     email: "selcuk.arslan@ktu.edu.tr",
     educationTr: ["KTÜ Tıp Fakültesi"],
     educationEn: ["KTÜ Faculty of Medicine"],
@@ -780,7 +744,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/selcuk_kaya.png",
     unitTr: ["Enfeksiyon Polikliniği"],
-    stats: { patients: 16800, experience: 24 },
     email: "selcuk.kaya@ktu.edu.tr",
     educationTr: [
       "Ege Üniversitesi Tıp Fakültesi",
@@ -801,7 +764,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/serdar_turkyilmaz.jpg",
     unitTr: ["Genel Cerrahi Polikliniği"],
-    stats: { patients: 14800, surgeries: 4300, experience: 26 },
     email: "serdar.turkyilmaz@ktu.edu.tr",
     educationTr: [
       "Hacettepe Üniversitesi Tıp Fakültesi",
@@ -822,7 +784,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/suleyman_baykal.jpg",
     unitTr: ["Beyin Cerrahi Polikliniği"],
-    stats: { patients: 18400, surgeries: 4900, experience: 31 },
     email: "suleyman.baykal@ktu.edu.tr",
     educationTr: [
       "Ankara Tıp Fakültesi",
@@ -843,7 +804,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/suleyman_guven.png",
     unitTr: ["Kadın-Doğum Polikliniği"],
-    stats: { patients: 15900, surgeries: 3800, experience: 25 },
     email: "suleyman.guven@ktu.edu.tr",
     educationTr: [
       "KTÜ Tıp Fakültesi",
@@ -864,7 +824,6 @@ export const doctorsData: DoctorSeed[] = [
     title: "Prof. Dr.",
     image: "/assets/doctors/yilmaz_bulbul.jpg",
     unitTr: ["Göğüs Hastalıkları Polikliniği"],
-    stats: { patients: 19800, experience: 28 },
     email: "yilmaz.bulbul@ktu.edu.tr",
     educationTr: [
       "İstanbul Üniversitesi İstanbul Tıp Fakültesi",

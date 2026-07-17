@@ -65,23 +65,16 @@ export default function AdminPanel({
 
   // Form States - Doctor
   const initialDocImage = "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400";
-  const initialDocStats = { experience: 10, patients: 1200, surgeries: 100 };
   const initialDocBio = { tr: "", en: "", ar: "", ru: "", ka: "" };
   const [docName, setDocName] = useState("");
   const [docTitle, setDocTitle] = useState("Prof. Dr.");
   const [docUnitIds, setDocUnitIds] = useState<string[]>([]);
   const [docEmail, setDocEmail] = useState("");
   const [docImage, setDocImage] = useState(initialDocImage);
-  const [docStats, setDocStats] = useState(initialDocStats);
   const [docBio, setDocBio] = useState(initialDocBio);
   const [docEduTr, setDocEduTr] = useState("");
   const [docEduEn, setDocEduEn] = useState("");
   const [docEduAr, setDocEduAr] = useState("");
-
-  /** Seçili birimlerden en az biri cerrahi mi — "Ameliyat sayısı" alanı buna bağlı. */
-  const selectedUnitsAreSurgical = units.some(
-    (u) => docUnitIds.includes(u.id) && u.type === "surgical"
-  );
 
   // Form States - News
   const [newsImage, setNewsImage] = useState("https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1200");
@@ -159,11 +152,6 @@ export default function AdminPanel({
               title: docTitle,
               image: docImage,
               units: units.filter((u) => docUnitIds.includes(u.id)),
-              stats: {
-                patients: Number(docStats.patients) || 0,
-                experience: Number(docStats.experience) || 0,
-                surgeries: selectedUnitsAreSurgical ? Number(docStats.surgeries) || 0 : undefined
-              },
               email: docEmail,
               educationTr: docEduTr ? docEduTr.split(",").map(item => item.trim()) : ["KTÜ Tıp Fakültesi"],
               educationEn: docEduEn ? docEduEn.split(",").map(item => item.trim()) : ["KTÜ Faculty of Medicine"],
@@ -192,11 +180,6 @@ export default function AdminPanel({
         title: docTitle,
         image: docImage,
         units: units.filter((u) => docUnitIds.includes(u.id)),
-        stats: {
-          patients: Number(docStats.patients) || 0,
-          experience: Number(docStats.experience) || 0,
-          surgeries: selectedUnitsAreSurgical ? Number(docStats.surgeries) || 0 : undefined
-        },
         email: docEmail,
         educationTr: docEduTr ? docEduTr.split(",").map(item => item.trim()) : ["KTÜ Tıp Fakültesi"],
         educationEn: docEduEn ? docEduEn.split(",").map(item => item.trim()) : ["KTÜ Faculty of Medicine"],
@@ -226,11 +209,6 @@ export default function AdminPanel({
     setDocUnitIds(doc.units.map((u) => u.id));
     setDocEmail(doc.email);
     setDocImage(doc.image);
-    setDocStats({
-      experience: doc.stats.experience,
-      patients: doc.stats.patients,
-      surgeries: doc.stats.surgeries || 0
-    });
     setDocBio({
       tr: doc.bioTr || "",
       en: doc.bioEn || "",
@@ -256,7 +234,6 @@ export default function AdminPanel({
     setDocUnitIds([]);
     setDocEmail("");
     setDocImage(initialDocImage);
-    setDocStats(initialDocStats);
     setDocBio(initialDocBio);
     setDocEduTr("");
     setDocEduEn("");
@@ -835,21 +812,6 @@ export default function AdminPanel({
                             onChange={(e) => setDocImage(e.target.value)}
                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary text-primary"
                           />
-                        </div>
-
-                        <div className="border-t border-slate-100 pt-4">
-                          <label className="block text-xs font-black text-primary uppercase tracking-wider mb-3">Hekim İstatistikleri</label>
-                          <div className="grid grid-cols-1 gap-2">
-                            <div>
-                              <label className="block text-[9px] font-bold text-slate-400 mb-1">Hasta Sayısı</label>
-                              <input
-                                type="number"
-                                value={docStats.patients}
-                                onChange={(e) => setDocStats({...docStats, patients: Number(e.target.value)})}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2.5 text-xs font-semibold text-primary"
-                              />
-                            </div>
-                          </div>
                         </div>
 
                         <button
