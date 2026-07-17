@@ -28,7 +28,6 @@ const translations = {
     experienceVal: "Yıl",
     surgeriesVal: "Operasyon",
     aboutDoc: "Hekim Hakkında",
-    educationTitle: "Eğitim & Tıbbi Uzmanlık",
     contactDoc: "İletişim & Danışma",
     emailPlaceholder: "E-posta",
     statusBadge: "Akademik Kadro",
@@ -44,7 +43,6 @@ const translations = {
     experienceVal: "Years",
     surgeriesVal: "Operations",
     aboutDoc: "About the Physician",
-    educationTitle: "Education & Credentials",
     contactDoc: "Contact & Information",
     emailPlaceholder: "Email",
     statusBadge: "Academic Faculty",
@@ -60,7 +58,6 @@ const translations = {
     experienceVal: "سنة",
     surgeriesVal: "عملية",
     aboutDoc: "حول الطبيب",
-    educationTitle: "التعليم والخبرة الطبية",
     contactDoc: "الاتصال والاستفسار",
     emailPlaceholder: "البريد الإلكتروني",
     statusBadge: "الكادر الأكاديمي",
@@ -76,7 +73,6 @@ const translations = {
     experienceVal: "лет",
     surgeriesVal: "операций",
     aboutDoc: "Информация о враче",
-    educationTitle: "Образование и квалификация",
     contactDoc: "Контакты и консультация",
     emailPlaceholder: "Эл. почта",
     statusBadge: "Академический состав",
@@ -92,7 +88,6 @@ const translations = {
     experienceVal: "წელი",
     surgeriesVal: "ოპერაცია",
     aboutDoc: "ექიმის შესახებ",
-    educationTitle: "განათლება და კვალიფიკაცია",
     contactDoc: "კონტაქტი და კონსულტაცია",
     emailPlaceholder: "ელ-ფოსტა",
     statusBadge: "აკადემიური პერსონალი",
@@ -227,29 +222,24 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
               </p>
             </div>
 
-            {/* Biography content card */}
-            <div className="space-y-3">
+            {/* Biography + education, tek başlık altında */}
+            <div className="space-y-4">
               <h3 className="text-base font-black text-primary uppercase tracking-wider border-b border-slate-100 pb-2">
                 {t.aboutDoc}
               </h3>
               <p className="text-xs sm:text-sm text-neutral-600 font-medium leading-relaxed">
                 {docBio}
               </p>
-            </div>
-
-            {/* Education credentials */}
-            <div className="space-y-4">
-              <h3 className="text-base font-black text-primary uppercase tracking-wider border-b border-slate-100 pb-2">
-                {t.educationTitle}
-              </h3>
-              <ul className="space-y-3">
-                {docEducation.map((edu, idx) => (
-                  <li key={idx} className="flex items-start space-x-3 text-xs sm:text-sm font-semibold text-neutral-600">
-                    <CheckCircle2 className="h-4.5 w-4.5 text-primary shrink-0 mt-0.5" />
-                    <span>{edu}</span>
-                  </li>
-                ))}
-              </ul>
+              {docEducation.length > 0 && (
+                <ul className="space-y-3 pt-1">
+                  {docEducation.map((edu, idx) => (
+                    <li key={idx} className="flex items-start space-x-3 text-xs sm:text-sm font-semibold text-neutral-600">
+                      <CheckCircle2 className="h-4.5 w-4.5 text-primary shrink-0 mt-0.5" />
+                      <span>{edu}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Contact details */}
