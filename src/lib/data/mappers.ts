@@ -1,6 +1,6 @@
 import type { Doctor } from "@/lib/doctors";
 import type { NewsItem, NewsData } from "@/lib/news";
-import type { Unit } from "@/lib/units";
+import type { UnitRecord } from "@/lib/units";
 
 export const LOCALES = ["tr", "en", "ar", "ru", "ka"] as const;
 export type Locale = (typeof LOCALES)[number];
@@ -51,8 +51,7 @@ export interface UnitRow {
   sort_order: number;
 }
 
-/** A unit as loaded from the DB — the static Unit shape plus its row id. */
-export type UnitRecord = Unit & { id: string };
+export type { UnitRecord } from "@/lib/units";
 
 export function rowToUnitRecord(row: UnitRow): UnitRecord {
   return { id: row.id, tr: row.tr, en: row.en, ar: row.ar, ru: row.ru, ka: row.ka, type: row.type };

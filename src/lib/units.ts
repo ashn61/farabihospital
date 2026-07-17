@@ -9,6 +9,9 @@ export interface Unit {
   type: UnitType;
 }
 
+/** DB'den yüklenmiş bir birim — statik Unit şekli artı satır id'si. */
+export type UnitRecord = Unit & { id: string };
+
 export const units: Unit[] = [
   // --- Cerrahi (surgical) — 17 birim ---
   { tr: "Beyin Cerrahi Polikliniği", en: "Neurosurgery", ar: "جراحة الأعصاب", ru: "Нейрохирургия", ka: "ნეიროქირურგია", type: "surgical" },
