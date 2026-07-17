@@ -40,14 +40,26 @@ export async function saveDoctor(doc: Doctor, sortOrder: number): Promise<void> 
     .upsert(doctorToRow(doc, sortOrder), { onConflict: "id" });
   if (error) throw new Error(`saveDoctor failed: ${error.message}`);
 
-  // Birimler ayrı tabloda: önce hekimin mevcut bağlarını sil, sonra seçilenleri yaz.
-  const { error: delErr } = await admin.from("doctor_units").delete().eq("doctor_id", doc.id);
-  if (delErr) throw new Error(`saveDoctor (units temizleme) failed: ${delErr.message}`);
-
+  // Birimler ayrı tabloda: önce seçilenleri yaz (upsert, idempotent), sonra
+  // fazlalıkları sil. Bu sırayla hekim hiçbir zaman sıfır branşta kalmaz —
+  // insert (upsert) başarısız olsa bile mevcut bağlar silinmemiş olur.
   if (doc.units.length > 0) {
     const links = doc.units.map((u) => ({ doctor_id: doc.id, unit_id: u.id }));
-    const { error: insErr } = await admin.from("doctor_units").insert(links);
-    if (insErr) throw new Error(`saveDoctor (units yazma) failed: ${insErr.message}`);
+    const { error: upsertErr } = await admin
+      .from("doctor_units")
+      .upsert(links, { onConflict: "doctor_id,unit_id" });
+    if (upsertErr) throw new Error(`saveDoctor (units yazma) failed: ${upsertErr.message}`);
+
+    const idList = doc.units.map((u) => u.id).join(",");
+    const { error: delErr } = await admin
+      .from("doctor_units")
+      .delete()
+      .eq("doctor_id", doc.id)
+      .not("unit_id", "in", `(${idList})`);
+    if (delErr) throw new Error(`saveDoctor (units temizleme) failed: ${delErr.message}`);
+  } else {
+    const { error: delErr } = await admin.from("doctor_units").delete().eq("doctor_id", doc.id);
+    if (delErr) throw new Error(`saveDoctor (units temizleme) failed: ${delErr.message}`);
   }
 
   revalidatePath("/");
@@ -126,6 +138,19 @@ export async function saveUnit(unit: UnitInput): Promise<{ id: string }> {
 export async function deleteUnit(id: string): Promise<void> {
   await requireUser();
   const admin = createAdminClient();
+
+  // Sunucu tarafı koruma: birim en az bir hekimde kullanılıyorsa silme
+  // (doctor_units.unit_id -> units.id cascade siler, bu da hekimlerin
+  // branşını sessizce sıfırlayabilir).
+  const { count, error: countErr } = await admin
+    .from("doctor_units")
+    .select("doctor_id", { count: "exact", head: true })
+    .eq("unit_id", id);
+  if (countErr) throw new Error(`deleteUnit (kullanım kontrolü) failed: ${countErr.message}`);
+  if (count && count > 0) {
+    throw new Error(`Bu birim ${count} hekim tarafından kullanılıyor; önce onları başka birime taşıyın.`);
+  }
+
   const { error } = await admin.from("units").delete().eq("id", id);
   if (error) throw new Error(`deleteUnit failed: ${error.message}`);
   revalidatePath("/");
