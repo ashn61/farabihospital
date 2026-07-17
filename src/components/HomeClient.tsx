@@ -17,6 +17,7 @@ import {
   X
 } from "lucide-react";
 import Navbar, { Locale } from "@/components/shared/Navbar";
+import NewsTicker from "@/components/shared/NewsTicker";
 import Hero from "@/components/sections/Hero";
 import Footer from "@/components/shared/Footer";
 import ChatWidget from "@/components/shared/ChatWidget";
@@ -331,6 +332,14 @@ export default function HomeClient({
         onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
         availableLocales={PUBLIC_LOCALES}
       />
+
+      {/* Duyuru şeridi — Navbar'ın altında, Hero'nun üstünde.
+          88px: Navbar'ın kaymamış hali py-5 (20px+20px) + h-12 logo (48px) = 88px.
+          72px (brief'in önerdiği değer) yalnızca kaymış Navbar'ın (py-3) yüksekliğine denk
+          geliyordu ve sayfa ilk yüklendiğinde şeridin üst 16px'i Navbar'ın arkasında kalıyordu. */}
+      <div className="pt-[88px]">
+        <NewsTicker items={activeNews} locale={locale} />
+      </div>
 
       {/* Hero section */}
       <Hero currentLocale={locale} />

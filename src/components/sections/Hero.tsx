@@ -112,7 +112,7 @@ export default function Hero({ currentLocale }: HeroProps) {
   return (
     <section
       id="home"
-      className="relative min-h-screen pt-32 pb-16 flex items-center justify-center overflow-hidden bg-background w-full"
+      className="relative min-h-screen pt-12 pb-16 flex items-center justify-center overflow-hidden bg-background w-full"
     >
       {/* Subtle Blueish Brand Background Gradient */}
       <div className="absolute inset-0 bg-radial from-primary/5 via-transparent to-transparent z-0 pointer-events-none" />

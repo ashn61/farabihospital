@@ -70,3 +70,32 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 45, 98, 0.3);
 }
+
+/* Haber şeridi — kesintisiz yatay kayma.
+   İçerik iki kez basılır; -50% tam bir kopya kaydırır, başa dönüş görünmez. */
+@keyframes farabi-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.farabi-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: farabi-marquee 40s linear infinite;
+}
+
+.farabi-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* RTL (Arapça): ters yönde kay. */
+.farabi-marquee-track[data-rtl="true"] {
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .farabi-marquee-track {
+    animation: none;
+    transform: none;
+  }
+}
