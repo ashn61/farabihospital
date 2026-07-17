@@ -44,34 +44,34 @@ export function formatDoctorName(name: string, title: string, locale: string): s
   let translatedTitle = title;
   const normalizedTitle = title ? title.trim().toLowerCase() : "";
 
-  if (normalizedTitle.includes("prof")) {
-    if (locale === "tr") translatedTitle = "Prof. Dr.";
-    else if (locale === "en") translatedTitle = "Prof. Dr.";
-    else if (locale === "ar") translatedTitle = "أ. د.";
-    else if (locale === "ru") translatedTitle = "Проф. д-р";
-    else if (locale === "ka") translatedTitle = "პროფ. დოქტ.";
-  } else if (normalizedTitle.includes("assoc") || normalizedTitle.includes("doç") || normalizedTitle.includes("doc")) {
+  if (normalizedTitle.includes("assoc") || normalizedTitle.includes("doç") || normalizedTitle.includes("doc")) {
     if (locale === "tr") translatedTitle = "Doç. Dr.";
     else if (locale === "en") translatedTitle = "Assoc. Prof.";
     else if (locale === "ar") translatedTitle = "أ. م. د.";
-    else if (locale === "ru") translatedTitle = "Доц. д-р";
+    else if (locale === "ru") translatedTitle = "Доц. др";
     else if (locale === "ka") translatedTitle = "ასოც. პროფ.";
   } else if (
-    normalizedTitle.includes("asst") || 
-    normalizedTitle.includes("assist") || 
-    normalizedTitle.includes("yrd") || 
+    normalizedTitle.includes("asst") ||
+    normalizedTitle.includes("assist") ||
+    normalizedTitle.includes("yrd") ||
     normalizedTitle.includes("öğr")
   ) {
     if (locale === "tr") translatedTitle = "Dr. Öğr. Üyesi";
     else if (locale === "en") translatedTitle = "Asst. Prof.";
     else if (locale === "ar") translatedTitle = "أ. مس. د.";
-    else if (locale === "ru") translatedTitle = "Ассист. д-р";
+    else if (locale === "ru") translatedTitle = "Ассист. др";
     else if (locale === "ka") translatedTitle = "ასისტ. პროფ.";
+  } else if (normalizedTitle.includes("prof")) {
+    if (locale === "tr") translatedTitle = "Prof. Dr.";
+    else if (locale === "en") translatedTitle = "Prof. Dr.";
+    else if (locale === "ar") translatedTitle = "أ. د.";
+    else if (locale === "ru") translatedTitle = "Проф. др";
+    else if (locale === "ka") translatedTitle = "პროფ. დოქტ.";
   } else if (normalizedTitle.includes("dr") || normalizedTitle.startsWith("dr")) {
     if (locale === "tr") translatedTitle = "Dr.";
     else if (locale === "en") translatedTitle = "Dr.";
     else if (locale === "ar") translatedTitle = "د.";
-    else if (locale === "ru") translatedTitle = "Д-р";
+    else if (locale === "ru") translatedTitle = "Др";
     else if (locale === "ka") translatedTitle = "დოქტ.";
   }
 
@@ -134,7 +134,7 @@ export const doctorsData: Doctor[] = [
     bioTr: "Prof. Dr. Celal Tekinbaş, KTÜ Farabi Hastanesi Başhekimi ve Göğüs Cerrahisi Anabilim Dalı Başkanıdır. Akciğer kanseri cerrahisi ve trakea rezeksiyonları konusunda uluslararası düzeyde tanınmaktadır.",
     bioEn: "Prof. Dr. Celal Tekinbaş is the Chief Physician of KTÜ Farabi Hospital and Head of the Thoracic Surgery Department. He is internationally recognized for his work in lung cancer surgery and tracheal resections.",
     bioAr: "البروفيسور الدكتور جلال تيكينباش هو كبير الأطباء ورئيس قسم جراحة الصدر في مستشفى الفارابي بجامعة KTÜ. يحظى بشهرة دولية في مجال جراحة سرطان الرئة واستئصال القصبة الهوائية.",
-    bioRu: "Профессор д-р Джелал Текинбаш — главный врач больницы КТУ Фараби и заведующий отделением торакальной хирургии. Он признан на международном уровне благодаря своим работам в области хирургии рака легких.",
+    bioRu: "Профессор др Джелал Текинбаш — главный врач больницы КТУ Фараби и заведующий отделением торакальной хирургии. Он признан на международном уровне благодаря своим работам в области хирургии рака легких.",
     bioKa: "პროფ. დოქტ. ჯელალ ტეკინბაში არის კტუ ფარაბის ჰოსპიტალის მთავარი ექიმი და თორაკალური ქირურგიის დეპარტამენტის ხელმძღვანელი. იგი საერთაშორისოდ აღიარებულია ფილტვის კიბოს ქირურგიაში."
   },
   {
@@ -479,7 +479,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Abdülcemal Ümit Işık, mide, bağırsak, karaciğer ve safra yolları hastalıklarının tanı ve tedavisinde (endoskopi, kolonoskopi) önde gelen akademisyen hekimlerimizdendir.",
     bioEn: "Prof. Dr. Abdülcemal Ümit Işık is one of our leading academic physicians in the diagnosis and treatment of stomach, bowel, liver, and biliary tract diseases (endoscopy, colonoscopy).",
-    bioRu: "Профессор д-р Абдульджемаль Умит Ишик — один из наших ведущих врачей в области диагностики и лечения заболеваний желудка, кишечника, печени и желчевыводящих путей.",
+    bioRu: "Профессор др Абдульджемаль Умит Ишик — один из наших ведущих врачей в области диагностики и лечения заболеваний желудка, кишечника, печени и желчевыводящих путей.",
     bioKa: "პროფ. დოქტ. აბდულჯემალ უმიტ იშიკი არის ჩვენი ერთ-ერთი წამყვანი აკადემიური ექიმი კუჭის, ნაწლავების, ღვიძლისა და სანაღვლე გზების დაავადებების დიაგნოსტიკასა და მკურნალობაში."
   },
   {
@@ -505,7 +505,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Adnan Çalık, kolon, rektum kanserleri cerrahisi, laparoskopik fıtık cerrahisi ve obezite cerrahisinde önde gelen cerrahlarımızdan biridir.",
     bioEn: "Prof. Dr. Adnan Çalık is one of our leading surgeons in colon and rectal cancer surgery, laparoscopic hernia surgery, and bariatric (obesity) surgery.",
-    bioRu: "Профессор д-р Аднан Чалык — один из наших ведущих хирургов в области хирургии рака толстой и прямой кишки, лапароскопической герниопластики и хирургии ожирения.",
+    bioRu: "Профессор др Аднан Чалык — один из наших ведущих хирургов в области хирургии рака толстой и прямой кишки, лапароскопической герниопластики и хирургии ожирения.",
     bioKa: "პროფ. დოქტ. ადნან ჩალიქი არის ჩვენი ერთ-ერთი წამყვანი ქირურგი მსხვილი და სწორი ნაწლავის კიბოს ქირურგიაში, ლაპაროსკოპიულ თიაქარპლასტიკასა და ბარიატრიულ ქირურგიაში."
   },
   {
@@ -531,7 +531,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Ahmet Coşkun Özdemir, hipertansiyon, diyabet, sistemik otoimmün bozukluklar ve yaşlı sağlığı konularında 30 yılı aşkın klinik tecrübeye sahiptir.",
     bioEn: "Prof. Dr. Ahmet Coşkun Özdemir has more than 30 years of clinical experience in hypertension, diabetes, systemic autoimmune disorders, and geriatric health.",
-    bioRu: "Профессор д-р Ахмет Джошкун Оздемир имеет более 30 лет клинического опыта в лечении гипертонии, диабета, системных аутоиммунных заболеваний.",
+    bioRu: "Профессор др Ахмет Джошкун Оздемир имеет более 30 лет клинического опыта в лечении гипертонии, диабета, системных аутоиммунных заболеваний.",
     bioKa: "პროფ. დოქტ. აჰმედ ჯოშკუნ ოზდემირს აქვს 30 წელზე მეტი კლინიკური გამოცდილება ჰიპერტენზიის, დიაბეტის, სისტემური აუტოიმუნური დარღვევების მკურნალობაში."
   },
   {
@@ -557,7 +557,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Atila Türkyılmaz, özofagus (yemek borusu) kanseri cerrahisi, mediasten tümörleri ve akciğer transplantasyonu hazırlık/nakil süreçlerinde uzmandır.",
     bioEn: "Prof. Dr. Atila Türkyılmaz is an expert in esophageal cancer surgery, mediastinal tumors, and lung transplantation preparation and procedures.",
-    bioRu: "Профессор д-р Атила Тюркйылмаз — эксперт в области хирургии рака пищевода, опухолей средостения и подготовки к трансплантации легких.",
+    bioRu: "Профессор др Атила Тюркйылмаз — эксперт в области хирургии рака пищевода, опухолей средостения и подготовки к трансплантации легких.",
     bioKa: "პროფ. დოქტ. ატილა თურქიილმაზი არის ექსპერტი საყლაპავი მილის კიბოს ქირურგიაში, შუასაყრის სიმსივნეებსა და ფილტვის ტრანსპლანტაციის მომზადების პროცესებში."
   },
   {
@@ -583,7 +583,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Erhan Arslan, beyin tümörleri mikrocerrahisi, spinal dekompresyon, bel-boyun fıtıkları ve hidrosefali ameliyatlarında uzmanlaşmış kıdemli bir hekimdir.",
     bioEn: "Prof. Dr. Erhan Arslan is a senior physician specializing in brain tumor microsurgery, spinal decompression, lumbar-cervical disc herniation surgeries, and hydrocephalus.",
-    bioRu: "Профессор д-р Эрхан Арслан — ведущий специалист в области микрохирургии опухолей головного мозга, спинальной декомпрессии и хирургии грыж.",
+    bioRu: "Профессор др Эрхан Арслан — ведущий специалист в области микрохирургии опухолей головного мозга, спинальной декомпрессии и хирургии грыж.",
     bioKa: "პროფ. დოქტ. ერჰან არსლანი არის უფროსი ექიმი, რომელიც სპეციალიზდება თავის ტვინის სიმსივნეების მიკროქირურგიაზე, ხერხემლის დეკომპრესიაზე, თიაქრის ქირურგიაზე."
   },
   {
@@ -609,7 +609,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Erol Erduran, Akdeniz anemisi (Talasemi), çocukluk çağı kanama bozuklukları, hemofili ve kemik iliği yetmezliklerinin tedavisinde bölgesel ve ulusal çapta otoritelerdendir.",
     bioEn: "Prof. Dr. Erol Erduran is a regional and national authority in the treatment of Mediterranean anemia (Thalassemia), childhood bleeding disorders, hemophilia, and bone marrow failures.",
-    bioRu: "Профессор д-р Эрол Эрдуран является авторитетным специалистом в лечении средиземноморской анемии (талассемии), детских кровотечений и гемофилии.",
+    bioRu: "Профессор др Эрол Эрдуран является авторитетным специалистом в лечении средиземноморской анемии (талассемии), детских кровотечений и гемофилии.",
     bioKa: "პროფ. დოქტ. ეროლ ერდურანი არის რეგიონული და ეროვნული ავტორიტეტი ხმელთაშუა ზღვის ანემიის (თალასემია), ბავშვთა სისხლდენის დარღვევებისა და ჰემოფილიის მკურნალობაში."
   },
   {
@@ -635,7 +635,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Ersagun Karagüzel, hipospadias (peygamber sünneti) onarımı, inmemiş testis, vezikoureteral reflü ve pediatrik üriner taş hastalıkları cerrahisinde öncü çalışmalar yapmıştır.",
     bioEn: "Prof. Dr. Ersagun Karagüzel has conducted pioneering studies in hypospadias repair, undescended testis, vesicoureteral reflux, and pediatric urinary stone surgeries.",
-    bioRu: "Профессор д-р Эрсагун Карагюзель провел новаторские исследования в области пластики гипоспадии, неопущения яичка и детской мочекаменной болезни.",
+    bioRu: "Профессор др Эрсагун Карагюзель провел новаторские исследования в области пластики гипоспадии, неопущения яичка и детской мочекаменной болезни.",
     bioKa: "პროფ. დოქტ. ერსაგუნ ქარაგუზელმა ჩაატარა პიონერული კვლევები ჰიპოსპადიის პლასტიკაში, კრიპტორქიზმსა და ბავშვთა შარდკენჭოვან დაავადებებში."
   },
   {
@@ -661,7 +661,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Ertuğrul Çakır, spinal enstrümantasyon (platin yerleştirilmesi), kafa tabanı cerrahisi ve pediatrik nöroşirürji girişimlerinde yüksek uzmanlık sahibidir.",
     bioEn: "Prof. Dr. Ertuğrul Çakır has high expertise in spinal instrumentation (hardware placement), skull base surgery, and pediatric neurosurgical interventions.",
-    bioRu: "Профессор д-р Эртугрул Чакыр обладает высокой квалификацией в области спинальной инструментации, хирургии основания черепа и детской нейрохирургии.",
+    bioRu: "Профессор др Эртугрул Чакыр обладает высокой квалификацией в области спинальной инструментации, хирургии основания черепа и детской нейрохирургии.",
     bioKa: "პროფ. დოქტ. ერტუგრულ ჩაქირს აქვს დიდი გამოცდილება ხერხემლის ინსტრუმენტაციაში, თავის ქალას ფუძის ქირურგიასა და პედიატრიულ ნეიროქირურგიაში."
   },
   {
@@ -687,7 +687,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Fazıl Orhan, çocuklarda astım, besin alerjileri, egzama (atopik dermatit) ve bağışıklık sistemi yetmezliklerinin tanı ve tedavisinde geniş kapsamlı akademik ve klinik hizmet sunmaktadır.",
     bioEn: "Prof. Dr. Fazıl Orhan provides comprehensive academic and clinical services in the diagnosis and treatment of pediatric asthma, food allergies, eczema, and immunodeficiencies.",
-    bioRu: "Профессор д-р Фазыл Орхан предлагает комплексные академические и клинические услуги в диагностике и лечении детской астмы, пищевой аллергии, экземы.",
+    bioRu: "Профессор др Фазыл Орхан предлагает комплексные академические и клинические услуги в диагностике и лечении детской астмы, пищевой аллергии, экземы.",
     bioKa: "პროფ. დოქტ. ფაზილ ორჰანი სთავაზობს პაციენტებს კომპლექსურ აკადემიურ და კლინიკურ მომსახურებას ბავშვთა ასთმის, კვებითი ალერგიების, ეგზემისა და იმუნოდეფიციტების მიმართულებით."
   },
   {
@@ -713,7 +713,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Hidayet Erdöl, katarakt cerrahisi, retina dekolmanı tedavileri, şaşılık düzeltmeleri ve glokom (göz tansiyonu) cerrahisinde derin bir tecrübeye sahiptir.",
     bioEn: "Prof. Dr. Hidayet Erdöl has deep experience in cataract surgery, retinal detachment treatments, strabismus corrections, and glaucoma surgeries.",
-    bioRu: "Профессор д-р Хидает Эрдоль обладает глубоким опытом в хирургии катаракты, лечении отслойки сетчатки, коррекции косоглазия и хирургии глаукомы.",
+    bioRu: "Профессор др Хидает Эрдоль обладает глубоким опытом в хирургии катаракты, лечении отслойки сетчатки, коррекции косоглазия и хирургии глаукомы.",
     bioKa: "პროფ. დოქტ. ჰიდაიეთ ერდოლს აქვს დიდი გამოცდილება კატარაქტის ქირურგიაში, ბადურის აცლის მკურნალობაში, სიელმის კორექციასა და გლაუკომის ქირურგიაში."
   },
   {
@@ -739,7 +739,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Mehmet Sönmez, lösemi, lenfoma, multipl miyelom tedavileri ve kemik iliği nakli (aferez ünitesi koordinasyonu) alanlarında bölgenin en yetkin uzmanlarındandır.",
     bioEn: "Prof. Dr. Mehmet Sönmez is one of the region's most competent specialists in leukemia, lymphoma, multiple myeloma treatments, and bone marrow transplantation.",
-    bioRu: "Профессор д-р Мехмет Сёнмез — один из самых компетентных специалистов региона в области лечения лейкемии, лимфомы, миеломы и трансплантации костного мозга.",
+    bioRu: "Профессор др Мехмет Сёнмез — один из самых компетентных специалистов региона в области лечения лейкемии, лимфомы, миеломы и трансплантации костного мозга.",
     bioKa: "პროფ. დოქტ. მეჰმედ სონმეზი არის რეგიონის ერთ-ერთი ყველაზე კომპეტენტური სპეციალისტი ლეიკემიის, ლიმფომის, მრავლობითი მიელომის მკურნალობასა და ძვლის ტვინის ტრანსპლანტაციაში."
   },
   {
@@ -765,7 +765,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Merih Kutlu, kompleks koroner girişimler, kalp pilleri, kapak hastalıkları transkateter tedavileri (TAVI) ve hipertansiyon yönetiminde ulusal düzeyde bir otoritedir.",
     bioEn: "Prof. Dr. Merih Kutlu is a national authority in complex coronary interventions, cardiac pacemakers, transcatheter valve therapies (TAVI), and hypertension management.",
-    bioRu: "Профессор д-р Мерих Кутлу — национальный авторитет в области сложных коронарных вмешательств, кардиостимуляторов, транскатетерной терапии клапанов (TAVI).",
+    bioRu: "Профессор др Мерих Кутлу — национальный авторитет в области сложных коронарных вмешательств, кардиостимуляторов, транскатетерной терапии клапанов (TAVI).",
     bioKa: "პროფ. დოქტ. მერიჰ ქუთლუ არის ეროვნული ავტორიტეტი რთულ კორონარულ ინტერვენციებში, კარდიოსტიმულატორებში, სარქვლოვან ტრანსკათეტერულ თერაპიაში (TAVI)."
   },
   {
@@ -791,7 +791,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Muhammet Uraloğlu, el cerrahisi, mikrocerrahi, dudak-damak yarıkları rekonstrüksiyonu ve estetik yüz/vücut cerrahisinde lider klinik profillerimizdendir.",
     bioEn: "Prof. Dr. Muhammet Uraloğlu is one of our leading clinical profiles in hand surgery, microsurgery, cleft lip-palate reconstructions, and aesthetic face/body surgery.",
-    bioRu: "Профессор д-р Мухаммет Уралоглу — один из наших ведущих специалистов в области хирургии кисти, микрохирургии, пластики расщелины губы и нёба.",
+    bioRu: "Профессор др Мухаммет Уралоглу — один из наших ведущих специалистов в области хирургии кисти, микрохирургии, пластики расщелины губы и нёба.",
     bioKa: "პროფ. დოქტ. მუჰამედ ურალოღლუ არის ჩვენი წამყვანი კლინიკური პროფილი მტევნის ქირურგიაში, მიკროქირურგიაში, კურდღლის ტუჩისა და მგლის ხახის რეკონსტრუქციასა და ესთეტიკურ ქირურგიაში."
   },
   {
@@ -817,7 +817,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Murat Çakır, çocuklarda çölyak hastalığı, inflamatuar bağırsak hastalıkları, karaciğer yetmezlikleri ve pediatrik endoskopi işlemlerinde derin bilgiye sahiptir.",
     bioEn: "Prof. Dr. Murat Çakır has deep knowledge in pediatric celiac disease, inflammatory bowel diseases, liver failures, and pediatric endoscopy procedures.",
-    bioRu: "Профессор д-р Мурат Чакыр обладает глубокими знаниями в области детской целиакии, воспалительных заболеваний кишечника, печеночной недостаточности.",
+    bioRu: "Профессор др Мурат Чакыр обладает глубокими знаниями в области детской целиакии, воспалительных заболеваний кишечника, печеночной недостаточности.",
     bioKa: "პროფ. დოქტ. მურატ ჩაქირს აქვს დიდი გამოცდილება ბავშვთა ცელიაკიის, ნაწლავის ანთებითი დაავადებების, ღვიძლის უკმარისობისა და პედიატრიული ენდოსკოპიის მიმართულებით."
   },
   {
@@ -843,7 +843,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Murat Livaoğlu, meme rekonstrüksiyonu, maksillofasiyal cerrahi, yanık tedavileri ve rinoplasti ameliyatlarında geniş bir hasta portföyüne ve klinik tecrübeye sahiptir.",
     bioEn: "Prof. Dr. Murat Livaoğlu has a broad patient portfolio and clinical experience in breast reconstruction, maxillofacial surgery, burn treatments, and rhinoplasty.",
-    bioRu: "Профессор д-р Мурат Ливаоглу имеет широкий клинический опыт в области реконструкции молочной железы, челюстно-лицевой хирургии, лечения ожогов.",
+    bioRu: "Профессор др Мурат Ливаоглу имеет широкий клинический опыт в области реконструкции молочной железы, челюстно-лицевой хирургии, лечения ожогов.",
     bioKa: "პროფ. დოქტ. მურატ ლივაოღლუს აქვს დიდი კლინიკური გამოცდილება ძუძუს რეკონსტრუქციაში, ყბა-სახის ქირურგიაში, დამწვრობის მკურნალობასა და რინოპლასტიკაში."
   },
   {
@@ -869,7 +869,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Mustafa İmamoğlu, yenidoğan cerrahisi, çocukluk çağı tümörleri, göğüs duvarı deformiteleri ve pediatrik laparoskopik/torakoskopik cerrahide öncü bir otoritedir.",
     bioEn: "Prof. Dr. Mustafa İmamoğlu is a leading authority in neonatal surgery, childhood tumors, chest wall deformities, and pediatric laparoscopic/thoracoscopic surgery.",
-    bioRu: "Профессор д-р Мустафа Имамоглу — ведущий специалист в области хирургии новорожденных, опухолей детского возраста и педиатрической лапароскопии.",
+    bioRu: "Профессор др Мустафа Имамоглу — ведущий специалист в области хирургии новорожденных, опухолей детского возраста и педиатрической лапароскопии.",
     bioKa: "პროფ. დოქტ. მუსტაფა იმამოღლუ არის წამყვანი ავტორიტეტი ახალშობილთა ქირურგიაში, ბავშვთა ასაკის სიმსივნეებსა და პედიატრიულ ლაპაროსკოპიულ ქირურგიაში."
   },
   {
@@ -895,7 +895,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Ömer Gedikli, kulak hastalıkları cerrahisi (otoloji/nörotoloji), koklear implant (biyonik kulak) uygulamaları ve baş boyun tümörleri cerrahisinde uzmandır.",
     bioEn: "Prof. Dr. Ömer Gedikli specializes in ear surgery (otology/neurotology), cochlear implant (bionic ear) applications, and head and neck tumor surgeries.",
-    bioRu: "Профессор д-р Омер Гедикли специализируется на хирургии уха (отология/невротология), кохлеарной имплантации и хирургии опухолей головы и шеи.",
+    bioRu: "Профессор др Омер Гедикли специализируется на хирургии уха (отология/невротология), кохлеарной имплантации и хирургии опухолей головы и шеи.",
     bioKa: "პროფ. დოქტ. ომერ გედიქლი სპეციალიზდება ყურის ქირურგიაზე (ოტოპლასტიკა), კოხლეარულ იმპლანტაციასა და თავ-კისრის სიმსივნეების ქირურგიაზე."
   },
   {
@@ -941,7 +941,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Selçuk Kaya, viral hepatitler, hastane enfeksiyonları, HIV/AIDS tedavileri ve seyahat sağlığı/enfeksiyonları yönetiminde uluslararası yayınlara sahip kıdemli bir akademisyendir.",
     bioEn: "Prof. Dr. Selçuk Kaya is a senior academic with international publications in viral hepatitis, hospital-acquired infections, HIV/AIDS, and travel medicine.",
-    bioRu: "Профессор д-р Сельчук Кая — ведущий академик с международными публикациями в области вирусных гепатитов, госпитальных инфекций, ВИЧ/СПИДа.",
+    bioRu: "Профессор др Сельчук Кая — ведущий академик с международными публикациями в области вирусных гепатитов, госпитальных инфекций, ВИЧ/СПИДа.",
     bioKa: "პროფ. დოქტ. სელჩუკ კაია არის უფროსი აკადემიკოსი საერთაშორისო პუბლიკაციებით ვირუსული ჰეპატიტების, ჰოსპიტალური ინფექციებისა და აივ/შიდსის მიმართულებით."
   },
   {
@@ -967,7 +967,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Serdar Türkyılmaz, meme kanseri cerrahisi (meme koruyucu yaklaşımlar), tiroid ve paratiroid cerrahisi, laparoskopik adrenalektomi konularında uzmandır.",
     bioEn: "Prof. Dr. Serdar Türkyılmaz specializes in breast cancer surgery (breast-conserving approaches), thyroid and parathyroid surgery, and laparoscopic adrenalectomy.",
-    bioRu: "Профессор д-р Сердар Тюркйылмаз специализируется на хирургии рака молочной железы, щитовидной и околощитовидных желез.",
+    bioRu: "Профессор др Сердар Тюркйылмаз специализируется на хирургии рака молочной железы, щитовидной и околощитовидных желез.",
     bioKa: "პროფ. დოქტ. სერდარ თურქიილმაზი სპეციალიზდება ძუძუს კიბოს ქირურგიაზე, ფარისებრი და ფარისებრახლო ჯირკვლების ქირურგიაზე."
   },
   {
@@ -993,7 +993,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Süleyman Baykal, beyin tümörleri, anevrizma cerrahisi, kafa tabanı yaklaşımları ve omurga patolojileri cerrahisinde 30 yılı aşkın süredir bölgemize hizmet vermektedir.",
     bioEn: "Prof. Dr. Süleyman Baykal has been serving our region for over 30 years in brain tumors, aneurysm surgery, skull base approaches, and spinal pathology surgeries.",
-    bioRu: "Профессор д-р Сулейман Байкал уже более 30 лет оказывает услуги в лечении опухолей головного мозга, аневризм и патологий позвоночника.",
+    bioRu: "Профессор др Сулейман Байкал уже более 30 лет оказывает услуги в лечении опухолей головного мозга, аневризм и патологий позвоночника.",
     bioKa: "პროფ. დოქტ. სულეიმან ბაიკალი 30 წელზე მეტია ემსახურება ჩვენს რეგიონს თავის ტვინის სიმსივნეების, ანევრიზმის ქირურგიისა და ხერხემლის პათოლოგიების მიმართულებით."
   },
   {
@@ -1019,7 +1019,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Süleyman Güven, infertilite (kısırlık) tedavileri, tüp bebek (IVF) uygulamaları, riskli gebelik takipleri ve jinekolojik kanser cerrahilerinde uluslararası ölçekte hastalar kabul etmektedir.",
     bioEn: "Prof. Dr. Süleyman Güven accepts international patients for infertility treatments, IVF applications, high-risk pregnancy monitoring, and gynecological cancer surgeries.",
-    bioRu: "Профессор д-р Сулейман Гювен принимает иностранных пациентов для лечения бесплодия, проведения ЭКО, ведения беременностей высокого риска.",
+    bioRu: "Профессор др Сулейман Гювен принимает иностранных пациентов для лечения бесплодия, проведения ЭКО, ведения беременностей высокого риска.",
     bioKa: "პროფ. დოქტ. სულეიმან გუვენი იღებს საერთაშორისო პაციენტებს უნაყოფობის მკურნალობის, IVF პროცედურების, მაღალი რისკის ორსულობისა და გინეკოლოგიური კიბოს ქირურგიის მიმართულებით."
   },
   {
@@ -1045,7 +1045,7 @@ export const doctorsData: Doctor[] = [
     ],
     bioTr: "Prof. Dr. Yılmaz Bülbül, KOAH, astım, pulmoner rehabilitasyon, akciğer embolisi ve uyku apne sendromu konularında öncü klinik ve akademik çalışmalara imza atmıştır.",
     bioEn: "Prof. Dr. Yılmaz Bülbül has led pioneering clinical and academic studies in COPD, asthma, pulmonary rehabilitation, lung embolism, and sleep apnea syndrome.",
-    bioRu: "Профессор д-р Йылмаз Бюльбюль провел ведущие клинические и академические исследования в области ХОБЛ, астмы, пульмонологической реабилитации.",
+    bioRu: "Профессор др Йылмаз Бюльбюль провел ведущие клинические и академические исследования в области ХОБЛ, астмы, пульмонологической реабилитации.",
     bioKa: "პროფ. დოქტ. ილმაზ ბულბულმა ჩაატარა პიონერული კლინიკური და აკადემიური კვლევები ფილტვების ქრონიკული ობსტრუქციული დაავადების, ასთმისა და ძილის აპნოეს მიმართულებით."
   }
 ];

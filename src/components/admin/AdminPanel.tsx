@@ -894,7 +894,7 @@ export default function AdminPanel({
                             <label className="block text-[9px] font-bold text-slate-400 mb-1">Rusça Biyografi (RU)</label>
                             <textarea
                               rows={3}
-                              placeholder="Профессор д-р Джелал..."
+                              placeholder="Профессор др Джелал..."
                               value={docBio.ru}
                               onChange={(e) => docBio && setDocBio({...docBio, ru: e.target.value})}
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-primary focus:outline-none focus:ring-1 focus:ring-primary"
