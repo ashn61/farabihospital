@@ -65,10 +65,19 @@ create table if not exists public.units (
   updated_at  timestamptz not null default now()
 );
 
+-- Doctor ↔ Unit (çoklu branş) -----------------------------------------
+create table if not exists public.doctor_units (
+  doctor_id   text not null references public.doctors(id) on delete cascade,
+  unit_id     uuid not null references public.units(id)   on delete cascade,
+  created_at  timestamptz not null default now(),
+  primary key (doctor_id, unit_id)
+);
+
 -- Row Level Security: public READ, writes only via service role --------
-alter table public.doctors enable row level security;
-alter table public.news    enable row level security;
-alter table public.units   enable row level security;
+alter table public.doctors      enable row level security;
+alter table public.news         enable row level security;
+alter table public.units        enable row level security;
+alter table public.doctor_units enable row level security;
 
 drop policy if exists "public read doctors" on public.doctors;
 create policy "public read doctors" on public.doctors for select using (true);
@@ -78,6 +87,9 @@ create policy "public read news" on public.news for select using (true);
 
 drop policy if exists "public read units" on public.units;
 create policy "public read units" on public.units for select using (true);
+
+drop policy if exists "public read doctor_units" on public.doctor_units;
+create policy "public read doctor_units" on public.doctor_units for select using (true);
 -- (No insert/update/delete policies: the service-role key bypasses RLS;
 --  the anon key therefore cannot write.)
 
