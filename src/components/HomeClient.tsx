@@ -17,7 +17,6 @@ import {
   X
 } from "lucide-react";
 import Navbar, { Locale } from "@/components/shared/Navbar";
-import NewsTicker from "@/components/shared/NewsTicker";
 import Hero from "@/components/sections/Hero";
 import Footer from "@/components/shared/Footer";
 import ChatWidget from "@/components/shared/ChatWidget";
@@ -333,13 +332,44 @@ export default function HomeClient({
         availableLocales={PUBLIC_LOCALES}
       />
 
-      {/* Duyuru şeridi — Navbar'ın altında, Hero'nun üstünde.
-          88px: Navbar'ın kaymamış hali py-5 (20px+20px) + h-12 logo (48px) = 88px.
-          72px (brief'in önerdiği değer) yalnızca kaymış Navbar'ın (py-3) yüksekliğine denk
-          geliyordu ve sayfa ilk yüklendiğinde şeridin üst 16px'i Navbar'ın arkasında kalıyordu. */}
-      <div className="pt-[88px]">
-        <NewsTicker items={activeNews} locale={locale} />
-      </div>
+      {/* #home is the page top: announcements is the landing section now, so the
+          Home nav item and the logo both return here. */}
+      <div id="home" />
+
+      {/* Announcements — the landing section, directly under the Navbar.
+          pt-[184px]: 88px fixed Navbar (unscrolled py-5 + h-12 logo) + 96px section rhythm. */}
+      <section id="announcements" className="pt-[184px] pb-24 bg-white/60 w-full relative">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-xs font-bold text-secondary uppercase tracking-widest mb-3">
+              {t.announcementsTitle}
+            </h2>
+            <p className="text-3xl sm:text-4xl font-black text-primary tracking-tight">
+              {t.announcementsSubtitle}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-center relative bg-[#f8fafc]/50 p-6 sm:p-12 rounded-[2.5rem] border border-neutral-200/50 shadow-2xs">
+            <CircularTestimonials
+              testimonials={activeNews}
+              autoplay={true}
+              colors={{
+                name: "#002d62", // Brand Primary Navy
+                designation: "#f5a623", // Brand Secondary Gold
+                testimony: "#4b5563",
+                arrowBackground: "#002d62",
+                arrowForeground: "#ffffff",
+                arrowHoverBackground: "#f5a623",
+              }}
+              fontSizes={{
+                name: "24px",
+                designation: "13px",
+                quote: "15px",
+              }}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Hero section */}
       <Hero currentLocale={locale} />
@@ -690,40 +720,6 @@ export default function HomeClient({
               )}
             </AnimatePresence>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Announcements Bento Board Section */}
-      <section id="announcements" className="py-24 bg-white/60 w-full relative">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold text-secondary uppercase tracking-widest mb-3">
-              {t.announcementsTitle}
-            </h2>
-            <p className="text-3xl sm:text-4xl font-black text-primary tracking-tight">
-              {t.announcementsSubtitle}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-center relative bg-[#f8fafc]/50 p-6 sm:p-12 rounded-[2.5rem] border border-neutral-200/50 shadow-2xs">
-            <CircularTestimonials
-              testimonials={activeNews}
-              autoplay={true}
-              colors={{
-                name: "#002d62", // Brand Primary Navy
-                designation: "#f5a623", // Brand Secondary Gold
-                testimony: "#4b5563",
-                arrowBackground: "#002d62",
-                arrowForeground: "#ffffff",
-                arrowHoverBackground: "#f5a623",
-              }}
-              fontSizes={{
-                name: "24px",
-                designation: "13px",
-                quote: "15px",
-              }}
-            />
-          </div>
         </div>
       </section>
 

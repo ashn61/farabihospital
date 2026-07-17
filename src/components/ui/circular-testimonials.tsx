@@ -9,6 +9,15 @@ import React, {
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
+/** How long a slide stays up before autoplay advances. */
+const AUTOPLAY_INTERVAL_MS = 5000;
+/**
+ * Budget for revealing a quote word-by-word. Must stay comfortably under
+ * AUTOPLAY_INTERVAL_MS, or a long announcement rotates away mid-reveal and its
+ * ending is never readable.
+ */
+const QUOTE_REVEAL_BUDGET_S = 1.6;
+
 interface Testimonial {
   quote: string;
   name: string;
@@ -97,7 +106,7 @@ export const CircularTestimonials = ({
     if (autoplay && testimonialsLength > 0) {
       autoplayIntervalRef.current = setInterval(() => {
         setActiveIndex((prev) => (prev + 1) % testimonialsLength);
-      }, 5000);
+      }, AUTOPLAY_INTERVAL_MS);
     }
     return () => {
       if (autoplayIntervalRef.current) clearInterval(autoplayIntervalRef.current);
@@ -175,11 +184,22 @@ export const CircularTestimonials = ({
   }
 
   // Framer Motion variants for quote
+  // Opacity-only: the content column is an overflow-y-auto scroller, and a
+  // vertical translate on its child fights the scroll box (it clips the first
+  // line). The per-word blur-in below already carries the motion.
   const quoteVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -20 },
   };
+
+  // Announcement bodies range from ~130 to ~1500 characters. At a flat 0.025s
+  // per word the longest one's last word landed at 5.6s — past the 5s autoplay
+  // rotation, so its ending was never seen. Spread the reveal over a fixed
+  // budget instead: short quotes keep the snappy per-word feel, long ones
+  // always finish well inside the window.
+  const quoteWords = activeTestimonial?.quote.split(" ") ?? [];
+  const wordStagger = Math.min(0.025, QUOTE_REVEAL_BUDGET_S / Math.max(quoteWords.length, 1));
 
   if (!testimonials || testimonials.length === 0 || !activeTestimonial) {
     return (
@@ -192,10 +212,13 @@ export const CircularTestimonials = ({
   }
 
   return (
-    <div className="w-full max-w-4xl p-4 sm:p-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 sm:gap-20">
+    <div className="w-full p-4 sm:p-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 sm:gap-16 md:items-start">
         {/* Images */}
-        <div className="relative w-full h-[18rem] sm:h-[24rem] [perspective:1000px]" ref={imageContainerRef}>
+        <div
+          className="relative w-full h-[18rem] sm:h-[26rem] [perspective:1000px]"
+          ref={imageContainerRef}
+        >
           {testimonials.map((testimonial, index) => (
             <img
               key={`${testimonial.src}-${index}`}
@@ -207,8 +230,10 @@ export const CircularTestimonials = ({
             />
           ))}
         </div>
-        {/* Content */}
-        <div className="flex flex-col justify-between">
+        {/* Content — fixed height matching the image so every slide is the same
+            size. Announcement bodies range from ~130 to ~1500 characters, so
+            without this the box resizes on every rotation; long ones scroll. */}
+        <div className="flex flex-col md:h-[26rem]">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
@@ -217,7 +242,7 @@ export const CircularTestimonials = ({
               animate="animate"
               exit="exit"
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="space-y-4"
+              className="flex-1 min-h-0 flex flex-col space-y-4"
             >
               <div>
                 <h3
@@ -234,10 +259,10 @@ export const CircularTestimonials = ({
                 </p>
               </div>
               <motion.p
-                className="leading-relaxed font-semibold"
+                className="leading-relaxed font-semibold flex-1 min-h-0 overflow-y-auto pr-3"
                 style={{ color: colorTestimony, fontSize: fontSizeQuote }}
               >
-                {activeTestimonial.quote.split(" ").map((word, i) => (
+                {quoteWords.map((word, i) => (
                   <motion.span
                     key={i}
                     initial={{
@@ -253,7 +278,7 @@ export const CircularTestimonials = ({
                     transition={{
                       duration: 0.22,
                       ease: "easeInOut",
-                      delay: 0.025 * i,
+                      delay: i * wordStagger,
                     }}
                     style={{ display: "inline-block" }}
                   >
@@ -263,7 +288,7 @@ export const CircularTestimonials = ({
               </motion.p>
             </motion.div>
           </AnimatePresence>
-          <div className="flex gap-4 pt-10 md:pt-0">
+          <div className="flex gap-4 pt-8 shrink-0">
             <button
               className="w-11 h-11 rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300 border-none outline-none shadow-sm hover:scale-105 active:scale-95"
               onClick={handlePrev}

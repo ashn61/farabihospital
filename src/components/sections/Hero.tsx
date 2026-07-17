@@ -111,8 +111,8 @@ export default function Hero({ currentLocale }: HeroProps) {
 
   return (
     <section
-      id="home"
-      className="relative min-h-screen pt-12 pb-16 flex items-center justify-center overflow-hidden bg-background w-full"
+      id="hospital"
+      className="relative py-24 flex items-center justify-center overflow-hidden bg-background w-full"
     >
       {/* Subtle Blueish Brand Background Gradient */}
       <div className="absolute inset-0 bg-radial from-primary/5 via-transparent to-transparent z-0 pointer-events-none" />
@@ -184,17 +184,18 @@ export default function Hero({ currentLocale }: HeroProps) {
             </a>
           </motion.div>
 
-          {/* Key Indicators Ribbon */}
+          {/* Key Indicators Ribbon — centred to match the column now that the
+              portrait is gone; left-aligned cells read as a stray edge here. */}
           <motion.div
             variants={itemVariants}
-            className="grid grid-cols-2 gap-6 pt-10 border-t border-neutral-200/50 w-full max-w-md"
+            className="grid grid-cols-2 gap-10 pt-10 mx-auto border-t border-neutral-200/50 w-full max-w-md"
           >
-            <div className="flex flex-col text-left">
+            <div className="flex flex-col items-center text-center">
               <span className="text-2xl sm:text-3xl font-extrabold text-primary">43</span>
               <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-1">{t.statSpecialties}</span>
             </div>
-            
-            <div className="flex flex-col text-left group relative cursor-pointer">
+
+            <div className="flex flex-col items-center text-center group relative cursor-pointer">
               <div className="flex items-center space-x-1.5">
                 <span className="text-2xl sm:text-3xl font-extrabold text-primary">900+</span>
                 <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary/5 text-primary text-[9px] font-bold border border-primary/10 transition-colors group-hover:bg-primary group-hover:text-white">
@@ -204,8 +205,8 @@ export default function Hero({ currentLocale }: HeroProps) {
               <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-1">{t.statDoctors}</span>
               
               {/* Premium Hover Card */}
-              <div className={`absolute bottom-full mb-3 w-64 bg-white/95 backdrop-blur-lg border border-primary/10 shadow-2xl rounded-2xl p-4 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 ${isAr ? "right-0" : "left-0"}`}>
-                <div className={`absolute -bottom-1.5 w-3 h-3 bg-white border-r border-b border-primary/10 rotate-45 ${isAr ? "right-6" : "left-6"}`} />
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 bg-white/95 backdrop-blur-lg border border-primary/10 shadow-2xl rounded-2xl p-4 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300">
+                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-primary/10 rotate-45" />
                 <p className="text-[11px] font-bold text-primary uppercase tracking-wider mb-3 pb-2 border-b border-neutral-100">
                   {t.academicStaffBreakdown}
                 </p>
