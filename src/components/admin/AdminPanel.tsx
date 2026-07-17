@@ -64,13 +64,16 @@ export default function AdminPanel({
   const [savingNews, setSavingNews] = useState(false);
 
   // Form States - Doctor
+  const initialDocImage = "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400";
+  const initialDocStats = { experience: 10, patients: 1200, surgeries: 100 };
+  const initialDocBio = { tr: "", en: "", ar: "", ru: "", ka: "" };
   const [docName, setDocName] = useState("");
   const [docTitle, setDocTitle] = useState("Prof. Dr.");
   const [docUnitIds, setDocUnitIds] = useState<string[]>([]);
   const [docEmail, setDocEmail] = useState("");
-  const [docImage, setDocImage] = useState("https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400");
-  const [docStats, setDocStats] = useState({ experience: 10, patients: 1200, surgeries: 100 });
-  const [docBio, setDocBio] = useState({ tr: "", en: "", ar: "", ru: "", ka: "" });
+  const [docImage, setDocImage] = useState(initialDocImage);
+  const [docStats, setDocStats] = useState(initialDocStats);
+  const [docBio, setDocBio] = useState(initialDocBio);
   const [docEduTr, setDocEduTr] = useState("");
   const [docEduEn, setDocEduEn] = useState("");
   const [docEduAr, setDocEduAr] = useState("");
@@ -246,16 +249,23 @@ export default function AdminPanel({
     }
   };
 
-  const handleCancelEditDoctor = () => {
+  const resetDoctorForm = () => {
     setEditingDoctorId(null);
     setDocName("");
-    setDocEmail("");
+    setDocTitle("Prof. Dr.");
     setDocUnitIds([]);
-    setDocBio({ tr: "", en: "", ar: "", ru: "", ka: "" });
+    setDocEmail("");
+    setDocImage(initialDocImage);
+    setDocStats(initialDocStats);
+    setDocBio(initialDocBio);
     setDocEduTr("");
     setDocEduEn("");
     setDocEduAr("");
     setDoctorFormTab("basic");
+  };
+
+  const handleCancelEditDoctor = () => {
+    resetDoctorForm();
   };
 
   // Delete Doctor Handler

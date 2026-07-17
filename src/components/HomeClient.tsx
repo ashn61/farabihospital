@@ -49,9 +49,9 @@ const translations = {
     allCategories: "Tüm Birimler",
     filterSurgical: "Cerrahi",
     filterInternal: "Dahili",
+    removeUnitFilter: "Birim filtresini kaldır",
     noDoctorsFound: "Arama kriterlerine uygun hekim bulunamadı.",
     doctorDetailsBtn: "Detaylı Profil",
-    experienceYears: "Yıl Deneyim",
 
     announcementsTitle: "Haberler & Başarılar",
     announcementsSubtitle: "Hastanemizde Gerçekleştirilen Başarılı Operasyonlar",
@@ -96,9 +96,9 @@ const translations = {
     allCategories: "All Departments",
     filterSurgical: "Surgical",
     filterInternal: "Internal",
+    removeUnitFilter: "Remove department filter",
     noDoctorsFound: "No physicians match your search criteria.",
     doctorDetailsBtn: "Detailed Profile",
-    experienceYears: "Years Exp",
 
     announcementsTitle: "News & Successes",
     announcementsSubtitle: "Successful Medical Operations Performed at KTÜ Farabi",
@@ -143,9 +143,9 @@ const translations = {
     allCategories: "جميع الأقسام",
     filterSurgical: "الجراحية",
     filterInternal: "الباطنية",
+    removeUnitFilter: "إزالة عامل تصفية القسم",
     noDoctorsFound: "لم يتم العثور على أطباء يطابقون معايير البحث.",
     doctorDetailsBtn: "الملف التفصيلي",
-    experienceYears: "سنة خبرة",
 
     announcementsTitle: "الأخبار والإنجازات",
     announcementsSubtitle: "العمليات الجراحية الناجحة التي أجريت في مستشفانا",
@@ -190,9 +190,9 @@ const translations = {
     allCategories: "Все отделения",
     filterSurgical: "Хирургия",
     filterInternal: "Терапия",
+    removeUnitFilter: "Убрать фильтр по отделению",
     noDoctorsFound: "Врачи, соответствующие критериям поиска, не найдены.",
     doctorDetailsBtn: "Подробный профиль",
-    experienceYears: "лет опыта",
 
     announcementsTitle: "Новости и достижения",
     announcementsSubtitle: "Успешные медицинские операции, проведенные в клинике",
@@ -237,9 +237,9 @@ const translations = {
     allCategories: "ყველა განყოფილება",
     filterSurgical: "ქირურგიული",
     filterInternal: "თერაპიული",
+    removeUnitFilter: "განყოფილების ფილტრის მოხსნა",
     noDoctorsFound: "ექიმები მითითებული კრიტერიუმით ვერ მოიძებნა.",
     doctorDetailsBtn: "დეტალური პროფილი",
-    experienceYears: "წლის გამოცდილება",
 
     announcementsTitle: "სიახლეები და მიღწევები",
     announcementsSubtitle: "ჩვენს კლინიკაში ჩატარებული წარმატებული ოპერაციები",
@@ -639,7 +639,7 @@ export default function HomeClient({
                 <button
                   onClick={() => setSelectedUnitId(null)}
                   className="p-1 rounded-full hover:bg-primary/10 transition-colors cursor-pointer"
-                  aria-label="Birim filtresini kaldır"
+                  aria-label={t.removeUnitFilter}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>

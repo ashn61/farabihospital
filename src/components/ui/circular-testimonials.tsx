@@ -258,6 +258,9 @@ export const CircularTestimonials = ({
                 </p>
               </div>
               <motion.p
+                tabIndex={0}
+                role="region"
+                aria-label={activeTestimonial.name}
                 className="leading-relaxed font-semibold flex-1 min-h-0 overflow-y-auto pr-3"
                 style={{ color: colorTestimony, fontSize: fontSizeQuote }}
               >

@@ -1,9 +1,7 @@
 import { isSurgical, type Doctor } from "@/lib/doctors";
 import type { NewsItem, NewsData } from "@/lib/news";
 import type { UnitRecord } from "@/lib/units";
-
-export const LOCALES = ["tr", "en", "ar", "ru", "ka"] as const;
-export type Locale = (typeof LOCALES)[number];
+import type { Locale } from "@/lib/locale";
 
 export interface DoctorRow {
   id: string;
@@ -54,9 +52,13 @@ export function rowToUnitRecord(row: UnitRow): UnitRecord {
 }
 
 export function rowToDoctor(row: DoctorRow): Doctor {
+  // getUnits() orders units by sort_order then tr (see units.ts); mirror that
+  // ordering here so a doctor's branch chips render deterministically instead
+  // of depending on the nested-select row order Supabase happens to return.
   const units = (row.doctor_units ?? [])
     .map((du) => du.units)
     .filter((u): u is UnitRow => u !== null)
+    .sort((a, b) => a.sort_order - b.sort_order || a.tr.localeCompare(b.tr))
     .map(rowToUnitRecord);
 
   return {
