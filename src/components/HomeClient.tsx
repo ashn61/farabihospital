@@ -12,7 +12,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  Sparkles,
   ArrowRight,
   ChevronRight,
   X
@@ -353,7 +352,7 @@ export default function HomeClient({
             <motion.div
               whileHover={{ y: -6, scale: 1.01 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="glass-panel border rounded-3xl p-8 flex flex-col justify-between shadow-xs relative overflow-hidden"
+              className="glass-panel border rounded-3xl p-8 flex flex-col shadow-xs relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem]" />
               <div className="space-y-4 relative z-10">
@@ -365,17 +364,13 @@ export default function HomeClient({
                   {t.aboutCard1Desc}
                 </p>
               </div>
-              <div className="pt-6 flex items-center text-[10px] font-black text-primary uppercase tracking-wider">
-                <span>International Hub</span>
-                <Sparkles className="h-3.5 w-3.5 ml-1 text-secondary animate-spin" />
-              </div>
             </motion.div>
 
             {/* Bento Card 2 */}
             <motion.div
               whileHover={{ y: -6, scale: 1.01 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="glass-panel border rounded-3xl p-8 flex flex-col justify-between shadow-xs relative overflow-hidden"
+              className="glass-panel border rounded-3xl p-8 flex flex-col shadow-xs relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/5 rounded-bl-[4rem]" />
               <div className="space-y-4 relative z-10">
@@ -387,16 +382,13 @@ export default function HomeClient({
                   {t.aboutCard2Desc}
                 </p>
               </div>
-              <div className="pt-6 flex items-center text-[10px] font-black text-primary uppercase tracking-wider">
-                <span>Advanced Medical Tech</span>
-              </div>
             </motion.div>
 
             {/* Bento Card 3 */}
             <motion.div
               whileHover={{ y: -6, scale: 1.01 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="glass-panel border rounded-3xl p-8 flex flex-col justify-between shadow-xs relative overflow-hidden"
+              className="glass-panel border rounded-3xl p-8 flex flex-col shadow-xs relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-[4rem]" />
               <div className="space-y-4 relative z-10">
@@ -407,9 +399,6 @@ export default function HomeClient({
                 <p className="text-xs text-neutral-500 font-semibold leading-relaxed">
                   {t.aboutCard3Desc}
                 </p>
-              </div>
-              <div className="pt-6 flex items-center text-[10px] font-black text-primary uppercase tracking-wider">
-                <span>Academic Guidance</span>
               </div>
             </motion.div>
           </div>
