@@ -11,7 +11,13 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-/** Rusça doktor kısaltmasını normalize eder: д-р → др, Д-р → Др. */
+/**
+ * Rusça doktor kısaltmasını normalize eder: д-р → др, Д-р → Др.
+ *
+ * UYARI: Bu işlev yalnızca bu veri setinde görülen "Проф./Доц./Ассист. д-р"
+ * doktor-unvanı kısaltmasını eşleştirir (Cyrillic word boundary yok).
+ * Başka bir metin korpusunda yeniden kullanılmadan önce kontrol edilmesi gerekir.
+ */
 export function fixRuDr(text: string): string {
   return text.replace(/д-р/g, "др").replace(/Д-р/g, "Др");
 }
@@ -19,6 +25,7 @@ export function fixRuDr(text: string): string {
 async function main() {
   const { data, error } = await supabase.from("doctors").select("id,name,bio_ru");
   if (error) throw new Error(`fetch failed: ${error.message}`);
+  if (!data) throw new Error("fetch failed: veri dönmedi");
 
   const affected = data.filter((d) => /[дД]-р/.test(d.bio_ru ?? ""));
 
@@ -45,6 +52,7 @@ async function main() {
       .update({ bio_ru: fixRuDr(d.bio_ru as string) })
       .eq("id", d.id);
     if (upErr) throw new Error(`update ${d.id} failed: ${upErr.message}`);
+    console.log(`✓ ${d.id} ${d.name}`);
   }
   console.log(`${affected.length} hekim güncellendi.`);
 }
