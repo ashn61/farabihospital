@@ -1059,7 +1059,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Faz 4 — Çoklu branş (Task 8-15)
+## Faz 4 — Çoklu branş (Task 8-12)
 
 ### Task 8: `UnitRecord`'u `units.ts`'e taşı
 
@@ -1338,7 +1338,12 @@ Bu task kod değiştirmiyor, yalnızca veri yazıyor. Commit atılmaz.
 
 ---
 
-### Task 11: Tipler, mapper'lar ve veri katmanı
+### Task 11: Çoklu branş — tipler, tüketiciler ve seed (ATOMİK)
+
+> **Bu task atomiktir.** `Doctor` tipinden `specialtyTr`/`category` kalkınca tüm tüketiciler
+> aynı anda kırılır. `master`'da çalıştığımız için ara commit bırakılmaz: bölüm A-E tek
+> commit'te kapanır ve o commit'te hem `npx tsc --noEmit` hem `npx vitest run` yeşildir.
+> Bölümler yalnızca okuma kolaylığı için ayrılmıştır — aralarında commit yoktur.
 
 **Files:**
 - Modify: `src/lib/doctors.ts` (`Doctor` arayüzü, `doctorTypes`, `isSurgical`, statik dizi)
@@ -1346,16 +1351,26 @@ Bu task kod değiştirmiyor, yalnızca veri yazıyor. Commit atılmaz.
 - Modify: `src/lib/data/doctors.ts` (nested select)
 - Modify: `src/lib/doctors.units.test.ts` (yeniden yazılır)
 - Modify: `src/lib/doctors.test.ts` (kategori testleri eklenir)
+- Modify: `src/components/HomeClient.tsx` (filtre, çipler, arama)
+- Modify: `src/components/DoctorDetailClient.tsx` (çipler, ameliyat istatistiği)
+- Modify: `src/components/admin/AdminPanel.tsx` (birim checkbox'ları)
+- Modify: `src/app/admin/actions.ts` (`saveDoctor` → `doctor_units`)
+- Modify: `scripts/seed.ts` (birim seed adımı)
 
 **Interfaces:**
-- Consumes: `UnitRecord`, `UnitType` (`src/lib/units.ts`, Task 8)
+- Consumes: `UnitRecord`, `UnitType`, `unitLabel` (`src/lib/units.ts`, Task 8); dolu `doctor_units` (Task 10)
 - Produces:
   - `interface Doctor` — `specialtyTr/En/Ar/Ru/Ka` ve `category` yerine `units: UnitRecord[]`
   - `type DoctorSeed = Omit<Doctor, "units"> & { unitTr: string[] }` — statik dizi/seed girdi tipi
   - `doctorTypes(doc: Doctor): Set<UnitType>`
   - `isSurgical(doc: Doctor): boolean`
   - `rowToDoctor(row: DoctorRow): Doctor` — `row.doctor_units` nested birimlerini eşler
-  - `doctorToRow(doc: Doctor, sortOrder?: number): DoctorRow` — yalnızca `doctors` satırı; birimler çağıranın işi
+  - `doctorToRow(doc: Doctor, sortOrder?: number): Omit<DoctorRow, "doctor_units">` — yalnızca `doctors` satırı; birimler çağıranın işi
+  - `saveDoctor(doc: Doctor, sortOrder: number): Promise<void>` — imza aynı; artık `doctor_units` da yazar
+
+---
+
+#### Bölüm A — Tipler, mapper'lar ve veri katmanı
 
 - [ ] **Step 1: Başarısız testleri yaz**
 
@@ -1680,37 +1695,15 @@ export const getDoctorById = cache(async (id: string): Promise<Doctor | null> =>
 Run: `npx vitest run`
 Expected: PASS — `doctors.test.ts` (kategori testleri dahil) ve `doctors.units.test.ts` yeşil.
 
-Not: `npx tsc --noEmit` bu adımda **hâlâ hata verecek** — `HomeClient`, `DoctorDetailClient`, `AdminPanel`, `actions.ts` ve `seed.ts` kaldırılan `specialtyTr`/`category` alanlarına referans veriyor. Bunlar Task 12-15'te düzeltiliyor. Bu task'ın kapısı testlerin geçmesi.
-
-- [ ] **Step 9: Commit**
-
-```bash
-git add src/lib/doctors.ts src/lib/data/mappers.ts src/lib/data/doctors.ts src/lib/doctors.test.ts src/lib/doctors.units.test.ts
-git commit -m "feat: Doctor tipini çoklu branşa çevir
-
-specialtyTr/En/Ar/Ru/Ka ve category alanları kalktı; yerine
-units: UnitRecord[] geldi. Kategori artık birimlerin type'ından
-türüyor (doctorTypes/isSurgical). Veri katmanı doctor_units üzerinden
-nested select yapıyor. Statik dizi DoctorSeed tipine (unitTr) geçti.
-
-Tüketiciler (HomeClient, DoctorDetailClient, AdminPanel, actions,
-seed) sonraki task'larda güncelleniyor — tsc bu commit'te kırmızı.
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
-```
+`npx tsc --noEmit` bu noktada **hâlâ hata verir** — tüketiciler henüz güncel değil. Bu beklenen; commit atma, Bölüm B'ye geç. `tsc` Bölüm E'de yeşile döner.
 
 ---
 
-### Task 12: `HomeClient` — çoklu branş filtresi
+#### Bölüm B — `HomeClient`: çoklu branş filtresi
 
-**Files:**
-- Modify: `src/components/HomeClient.tsx:24,273,288,299,310-326,479-531,606-620,629-671`
+İlgili satırlar: `src/components/HomeClient.tsx:24,273,288,299,310-326,479-531,606-620,629-671`
 
-**Interfaces:**
-- Consumes: `Doctor`, `doctorTypes`, `isSurgical` (Task 11); `UnitRecord`, `unitLabel` (`src/lib/units.ts`)
-- Produces: yok
-
-- [ ] **Step 1: Importları ve prop tiplerini düzelt**
+- [ ] **Step 9: Importları ve prop tiplerini düzelt**
 
 Satır 24:
 ```tsx
@@ -1758,7 +1751,7 @@ Satır 288:
   const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
 ```
 
-- [ ] **Step 2: Filtre state'ini id'ye çevir**
+- [ ] **Step 10: Filtre state'ini id'ye çevir**
 
 Satır 299:
 ```tsx
@@ -1769,7 +1762,7 @@ Satır 299:
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
 ```
 
-- [ ] **Step 3: Filtre mantığını yeniden yaz**
+- [ ] **Step 11: Filtre mantığını yeniden yaz**
 
 Satır 309-326:
 ```tsx
@@ -1815,7 +1808,7 @@ Satır 309-326:
 
 Arama artık hekimin **tüm** birimlerinin beş dildeki adında geziyor (eskiden `ar` atlanıyordu — düzeltildi).
 
-- [ ] **Step 4: Birim tıklama çağrılarını id'ye çevir**
+- [ ] **Step 12: Birim tıklama çağrılarını id'ye çevir**
 
 Satır 489 ve 531 (`specialties` sekmesindeki birim kartları):
 ```tsx
@@ -1828,14 +1821,14 @@ Satır 489 ve 531 (`specialties` sekmesindeki birim kartları):
 
 `spec` artık `UnitRecord` olduğu için `.id` var. (`surgicalSpecialties` / `internalSpecialties` `initialUnits`'ten türüyor, tip otomatik `UnitRecord`.)
 
-- [ ] **Step 5: Filtre sıfırlamalarını yeniden adlandır**
+- [ ] **Step 13: Filtre sıfırlamalarını yeniden adlandır**
 
 Satır 568, 577, 586, 595 ve 612'deki `setSelectedUnit(null)` çağrılarını `setSelectedUnitId(null)` yap.
 
 Run: `grep -n "setSelectedUnit(" src/components/HomeClient.tsx`
 Expected: çıktı yok — hepsi `setSelectedUnitId(` olmalı.
 
-- [ ] **Step 6: Hekim kartında branş çipleri göster**
+- [ ] **Step 14: Hekim kartında branş çipleri göster**
 
 Satır 629-671 arasındaki kart gövdesini güncelle. Önce satır 630-635'teki tek branş hesabını **sil**:
 
@@ -1887,37 +1880,18 @@ Branş metnini (satır 669-671):
                           </div>
 ```
 
-- [ ] **Step 7: Tip kontrolü**
+- [ ] **Step 15: Tip kontrolü**
 
 Run: `npx tsc --noEmit 2>&1 | grep "HomeClient"`
-Expected: çıktı yok — `HomeClient.tsx` temiz. (Diğer dosyalar Task 13-15'e kadar hata vermeye devam edebilir.)
-
-- [ ] **Step 8: Commit**
-
-```bash
-git add src/components/HomeClient.tsx
-git commit -m "feat: HomeClient'ı çoklu branşa geçir
-
-Birim filtresi metin eşleşmesi yerine unit id kullanıyor; Cerrahi/
-Dahili sekmesi doctorTypes ile birimlerden türüyor. Hekim kartında tek
-branş metni yerine birim çipleri. Arama tüm birimlerin beş dilindeki
-adında geziyor (Arapça eskiden atlanıyordu).
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
-```
+Expected: çıktı yok — `HomeClient.tsx` temiz. (Diğer dosyalar Bölüm C-E'ye kadar hata vermeye devam eder; commit atma.)
 
 ---
 
-### Task 13: `DoctorDetailClient` — branş çipleri
+#### Bölüm C — `DoctorDetailClient`: branş çipleri
 
-**Files:**
-- Modify: `src/components/DoctorDetailClient.tsx:16-17` (import), `:148-153` (branş hesabı), `:218` (render), ameliyat istatistiği
+İlgili satırlar: `src/components/DoctorDetailClient.tsx:16-17` (import), `:148-153` (branş hesabı), `:218` (render), ameliyat istatistiği
 
-**Interfaces:**
-- Consumes: `Doctor`, `isSurgical` (Task 11); `unitLabel` (`src/lib/units.ts`)
-- Produces: yok
-
-- [ ] **Step 1: Importları güncelle**
+- [ ] **Step 16: Importları güncelle**
 
 Satır 16-17:
 ```tsx
@@ -1931,7 +1905,7 @@ import type { Doctor } from "@/lib/doctors";
 import { unitLabel } from "@/lib/units";
 ```
 
-- [ ] **Step 2: Tek branş hesabını sil**
+- [ ] **Step 17: Tek branş hesabını sil**
 
 Satır 147-153'teki bloğu tamamen sil:
 
@@ -1947,7 +1921,7 @@ Satır 147-153'teki bloğu tamamen sil:
 
 `docBio` ve `docEducation` hesapları aynen kalır.
 
-- [ ] **Step 3: Branş render'ını çiplere çevir**
+- [ ] **Step 18: Branş render'ını çiplere çevir**
 
 Satır 218 civarındaki `{docSpecialty}` kullanımını bul:
 
@@ -1970,7 +1944,7 @@ Bulunan satırdaki tek branş metnini, saran elemanıyla birlikte şununla deği
 
 Saran elemanın mevcut `className`'ini koru — yalnızca içeriği çip listesine çevir.
 
-- [ ] **Step 4: Ameliyat istatistiğini `isSurgical`'a bağla**
+- [ ] **Step 19: Ameliyat istatistiğini `isSurgical`'a bağla**
 
 `surgeriesTitle` istatistik kartının koşulunu bul:
 
@@ -1978,36 +1952,18 @@ Run: `grep -n "surgeriesTitle\|stats.surgeries" src/components/DoctorDetailClien
 
 Koşul `doctor.category === "surgical"` ise `isSurgical(doctor)` yap. Koşul `doctor.stats.surgeries` varlığına bakıyorsa değişiklik gerekmez — `doctorToRow` zaten cerrahi olmayan hekimde `null` yazıyor.
 
-- [ ] **Step 5: Tip kontrolü**
+- [ ] **Step 20: Tip kontrolü**
 
 Run: `npx tsc --noEmit 2>&1 | grep "DoctorDetailClient"`
 Expected: çıktı yok
 
-- [ ] **Step 6: Commit**
-
-```bash
-git add src/components/DoctorDetailClient.tsx
-git commit -m "feat: hekim detayında çoklu branş çipleri
-
-Tek branş metni yerine hekimin tüm birimleri çip olarak listeleniyor.
-Ameliyat istatistiği isSurgical ile birimlerden türüyor.
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
-```
-
 ---
 
-### Task 14: `AdminPanel` + `actions` — birim çoklu seçimi
+#### Bölüm D — `AdminPanel` + `actions`: birim çoklu seçimi
 
-**Files:**
-- Modify: `src/components/admin/AdminPanel.tsx:69,73,154-163,192-201,229,237-243,264-268,541,550,649-653` ve hekim formu
-- Modify: `src/app/admin/actions.ts:34-40` (`saveDoctor`)
+İlgili satırlar: `src/components/admin/AdminPanel.tsx:69,73,154-163,192-201,229,237-243,264-268,541,550,649-653` ve hekim formu; `src/app/admin/actions.ts:34-40`
 
-**Interfaces:**
-- Consumes: `Doctor`, `isSurgical`, `doctorTypes` (Task 11); `UnitRecord`, `unitLabel` (`src/lib/units.ts`)
-- Produces: `saveDoctor(doc: Doctor, sortOrder: number): Promise<void>` — imza aynı; artık `doctor_units` da yazıyor
-
-- [ ] **Step 1: `saveDoctor`'ı `doctor_units` yazacak şekilde güncelle**
+- [ ] **Step 21: `saveDoctor`'ı `doctor_units` yazacak şekilde güncelle**
 
 `src/app/admin/actions.ts:34-40`:
 
@@ -2049,7 +2005,7 @@ export async function saveDoctor(doc: Doctor, sortOrder: number): Promise<void> 
 
 `deleteDoctor` değişmiyor — `doctor_units.doctor_id` FK'si `on delete cascade` olduğu için bağlar kendiliğinden siliniyor.
 
-- [ ] **Step 2: Form state'ini birim seçimine çevir**
+- [ ] **Step 22: Form state'ini birim seçimine çevir**
 
 `src/components/admin/AdminPanel.tsx`:
 
@@ -2068,7 +2024,7 @@ Yerlerine ekle:
   const [docUnitIds, setDocUnitIds] = useState<string[]>([]);
 ```
 
-- [ ] **Step 3: Kaydetme akışlarını güncelle**
+- [ ] **Step 23: Kaydetme akışlarını güncelle**
 
 Satır 154-163 ve 192-201'deki iki `Doctor` nesnesi kurulumunda:
 
@@ -2102,7 +2058,7 @@ Bileşen gövdesinde, `docUnitIds` tanımından sonra türetilmiş değeri ekle:
   );
 ```
 
-- [ ] **Step 4: Düzenleme akışını güncelle**
+- [ ] **Step 24: Düzenleme akışını güncelle**
 
 Satır 229'u **sil**:
 ```tsx
@@ -2114,7 +2070,7 @@ Satır 237-243'teki `setDocSpec({...})` bloğunu **sil** ve yerine ekle:
     setDocUnitIds(doc.units.map((u) => u.id));
 ```
 
-- [ ] **Step 5: Form sıfırlamayı güncelle**
+- [ ] **Step 25: Form sıfırlamayı güncelle**
 
 Satır 266'yı:
 ```tsx
@@ -2125,7 +2081,7 @@ Satır 266'yı:
   setDocUnitIds([]);
 ```
 
-- [ ] **Step 6: Özet sayaçlarını güncelle**
+- [ ] **Step 26: Özet sayaçlarını güncelle**
 
 Satır 541:
 ```tsx
@@ -2147,7 +2103,7 @@ Satır 550:
 
 Not: Çoklu branşta toplam artık `cerrahi + dahili ≠ hekim sayısı` olabilir (iki tipte birimi olan hekim ikisinde de sayılır). Bu beklenen davranış.
 
-- [ ] **Step 7: Hekim listesindeki kategori rozetini güncelle**
+- [ ] **Step 27: Hekim listesindeki kategori rozetini güncelle**
 
 Satır 649-653:
 ```tsx
@@ -2164,7 +2120,7 @@ Satır 649-653:
 
 Mevcut koşullu `className` yapısını koru, yalnızca koşulu değiştir.
 
-- [ ] **Step 8: Kategori seçim alanını birim checkbox listesiyle değiştir**
+- [ ] **Step 28: Kategori seçim alanını birim checkbox listesiyle değiştir**
 
 Formda `docCategory` select'ini ve `docSpec` metin alanlarını bul:
 
@@ -2220,7 +2176,7 @@ Bunların form alanlarını sil ve yerine, hekim formunun "basic" sekmesine biri
 
 Birim listesi Türkçe (`u.tr`) gösteriliyor — admin paneli Türkçe.
 
-- [ ] **Step 9: "Ameliyat sayısı" alanını koşullu yap**
+- [ ] **Step 29: "Ameliyat sayısı" alanını koşullu yap**
 
 Formda `docStats.surgeries` girdisini bul:
 
@@ -2236,7 +2192,7 @@ Girdi alanını `selectedUnitsAreSurgical &&` ile sar:
                 )}
 ```
 
-- [ ] **Step 10: Importları güncelle**
+- [ ] **Step 30: Importları güncelle**
 
 `AdminPanel.tsx` import bloğunda `doctorTypes`'ı ekle:
 
@@ -2246,7 +2202,7 @@ import { formatDoctorName, getCleanName, doctorTypes, type Doctor } from "@/lib/
 
 (Mevcut import satırının tam hâline göre uyarla — `getCleanName` ve `formatDoctorName` zaten kullanımda.)
 
-- [ ] **Step 11: Tip + lint kontrolü**
+- [ ] **Step 31: Tip + lint kontrolü**
 
 Run: `npx tsc --noEmit 2>&1 | grep -E "AdminPanel|actions"`
 Expected: çıktı yok
@@ -2254,43 +2210,15 @@ Expected: çıktı yok
 Run: `npx eslint src/components/admin/AdminPanel.tsx src/app/admin/actions.ts`
 Expected: hata yok
 
-- [ ] **Step 12: Elle doğrula**
-
-1. `/admin`'e giriş yap.
-2. Bir hekimi düzenle → mevcut birimi checkbox'ta işaretli olmalı.
-3. İkinci bir birim seç (farklı tipte, ör. bir dahili birim) → kaydet.
-4. Ana sayfada o hekimin kartında **iki** birim çipi görünmeli.
-5. "Cerrahi" sekmesinde **ve** "Dahili" sekmesinde aynı hekim listelenmeli.
-6. Hekim detay sayfasında iki çip görünmeli.
-
-- [ ] **Step 13: Commit**
-
-```bash
-git add src/components/admin/AdminPanel.tsx src/app/admin/actions.ts
-git commit -m "feat: admin'de birim çoklu seçimi
-
-Kategori select'i ve beş dilli branş metin alanları kaldırıldı; yerine
-units tablosundan checkbox'lı çoklu seçim geldi. saveDoctor artık
-doctor_units bağlarını da yazıyor (önce sil, sonra ekle). Ameliyat
-sayısı alanı seçili birimlerden en az biri cerrahiyse görünüyor.
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
-```
-
 ---
 
-### Task 15: `seed.ts` — birimleri de seed et
+#### Bölüm E — `seed.ts`: birimleri de seed et
 
-**Files:**
-- Modify: `scripts/seed.ts:15-20`
+`doctorToRow` artık birimleri ifade etmiyor. `seedDoctors` bugünkü hâliyle çalışırsa tüm hekimler branşsız kalır.
 
-**Interfaces:**
-- Consumes: `doctorsData: DoctorSeed[]` (Task 11); `doctorToRow` (Task 11)
-- Produces: yok
+İlgili satırlar: `scripts/seed.ts:15-20`
 
-**Neden:** `doctorToRow` artık birimleri ifade etmiyor. `seedDoctors` bugünkü hâliyle çalışırsa tüm hekimler branşsız kalır.
-
-- [ ] **Step 1: Import bloğunu güncelle**
+- [ ] **Step 32: Import bloğunu güncelle**
 
 `scripts/seed.ts` import bloğuna ekle:
 
@@ -2298,7 +2226,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 import type { UnitRecord } from "../src/lib/units";
 ```
 
-- [ ] **Step 2: `seedDoctors`'ı iki adımlı yap**
+- [ ] **Step 33: `seedDoctors`'ı iki adımlı yap**
 
 `scripts/seed.ts:15-20`'deki fonksiyonu:
 
@@ -2355,44 +2283,76 @@ async function seedDoctors() {
 
 `resolveUnits` birimleri **tam** `UnitRecord` olarak çözüyor — `doctorToRow` `stats_surgeries`'i `isSurgical(doc)` ile hesapladığı için `type` alanı doğru gelmeli, yoksa cerrahi hekimlerin ameliyat sayısı sessizce `null` yazılır.
 
-- [ ] **Step 3: Tip kontrolü**
+---
+
+#### Bölüm F — Bütün doğrulama ve tek commit
+
+- [ ] **Step 34: Tam tip + test kontrolü**
 
 Run: `npx tsc --noEmit`
-Expected: hata yok — **tüm** tüketiciler artık güncel. Bu, Task 11'de kırmızıya düşen `tsc`'nin yeşile döndüğü nokta.
+Expected: hata yok — **tüm** tüketiciler artık güncel. Bölüm A'dan beri kırmızı olan `tsc` burada yeşile döner. Hata varsa commit atma, hangi bölümün eksik kaldığını bul.
 
 Run: `npx vitest run`
 Expected: PASS — hepsi
 
-- [ ] **Step 4: Seed'i çalıştırma**
+Run: `npx eslint src/ scripts/`
+Expected: hata yok
 
-Bu adımda `npm run seed` **çalıştırılmıyor** — canlı veriyi statik diziyle ezer ve admin'den eklenmiş 12 hekimi kaybettirir (DB'de 37, statik dizide ~25). Script'in tip olarak doğru olması yeterli. Seed yalnızca sıfırdan kurulumda kullanılır.
+- [ ] **Step 35: Seed'i çalıştırma**
 
-- [ ] **Step 5: Commit**
+`npm run seed` **çalıştırılmıyor** — canlı veriyi statik diziyle ezer ve admin'den eklenmiş 12 hekimi kaybettirir (DB'de 37, statik dizide ~25). Script'in tip olarak doğru olması yeterli. Seed yalnızca sıfırdan kurulumda kullanılır.
+
+- [ ] **Step 36: Elle doğrula**
+
+1. `/admin`'e giriş yap.
+2. Bir hekimi düzenle → mevcut birimi checkbox'ta işaretli olmalı.
+3. İkinci bir birim seç (farklı tipte, ör. bir dahili birim) → kaydet.
+4. Ana sayfada o hekimin kartında **iki** birim çipi görünmeli.
+5. "Cerrahi" sekmesinde **ve** "Dahili" sekmesinde aynı hekim listelenmeli.
+6. Hekim detay sayfasında iki çip görünmeli.
+7. Test için eklediğin ikinci birimi geri al (hekimi eski hâline döndür).
+
+- [ ] **Step 37: Tek atomik commit**
+
+Bölüm A-E'nin tamamı tek commit'te. Ara commit **yok** — bu commit'te `tsc` ve `vitest` ikisi de yeşil.
 
 ```bash
-git add scripts/seed.ts
-git commit -m "chore: seed'i doctor_units'e uyarla
+git add src/lib/doctors.ts src/lib/data/mappers.ts src/lib/data/doctors.ts \
+        src/lib/doctors.test.ts src/lib/doctors.units.test.ts \
+        src/components/HomeClient.tsx src/components/DoctorDetailClient.tsx \
+        src/components/admin/AdminPanel.tsx src/app/admin/actions.ts scripts/seed.ts
+git commit -m "feat: hekimlere çoklu branş desteği
 
-doctorToRow artık birimleri ifade etmiyor; seed birimleri units.tr
-üzerinden DB id'sine çevirip doctor_units'e yazıyor. Aksi hâlde seed
-sonrası tüm hekimler branşsız kalırdı.
+specialtyTr/En/Ar/Ru/Ka ve category alanları Doctor tipinden kalktı;
+yerine units: UnitRecord[] geldi. Kategori artık birimlerin type'ından
+türüyor (doctorTypes/isSurgical) — cerrahi+dahili birimi olan hekim iki
+sekmede de listeleniyor. Veri katmanı doctor_units üzerinden nested
+select yapıyor.
+
+Admin'de kategori select'i ve beş dilli branş metin alanları kaldırıldı;
+yerine units tablosundan checkbox'lı çoklu seçim geldi. saveDoctor
+doctor_units bağlarını da yazıyor. Arama tüm birimlerin beş dilindeki
+adında geziyor (Arapça eskiden atlanıyordu).
+
+Tip değişikliği ve tüm tüketicileri tek commit'te — master'ın her an
+derlenir kalması için atomik.
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```
 
 ---
 
-### Task 16: Eski kolonları düşür
+### Task 12: Eski kolonları düşür
 
 **Files:**
 - Create: `scripts/drop-legacy-doctor-columns.sql`
 - Modify: `supabase/schema.sql`
 
 **Interfaces:**
-- Consumes: dolu `doctor_units` (Task 10), güncellenmiş tüm tüketiciler (Task 11-15)
+- Consumes: dolu `doctor_units` (Task 10), güncellenmiş tüm tüketiciler (Task 11)
 - Produces: yok
 
-**Ön koşul:** Task 10-15 tamamlanmış, `npx tsc --noEmit` ve `npx vitest run` yeşil, site elle doğrulanmış olmalı. Bu geri dönüşü olmayan adım.
+**Ön koşul:** Task 10-11 tamamlanmış, `npx tsc --noEmit` ve `npx vitest run` yeşil, site elle doğrulanmış olmalı. Bu geri dönüşü olmayan adım.
 
 - [ ] **Step 1: Kolonların artık okunmadığını doğrula**
 
@@ -2488,9 +2448,9 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Faz 5 — Haber şeridi (Task 17)
+## Faz 5 — Haber şeridi (Task 13)
 
-### Task 17: Hero üstü kayan duyuru şeridi
+### Task 13: Hero üstü kayan duyuru şeridi
 
 **Files:**
 - Create: `src/components/shared/NewsTicker.tsx`
