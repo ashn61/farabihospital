@@ -15,7 +15,7 @@ import Footer from "@/components/shared/Footer";
 import ChatWidget from "@/components/shared/ChatWidget";
 import { formatDoctorName } from "@/lib/doctors";
 import type { Doctor } from "@/lib/doctors";
-import { readStoredLocale, storeLocale } from "@/lib/locale";
+import { readStoredLocale, storeLocale, PUBLIC_LOCALES } from "@/lib/locale";
 
 const translations = {
   tr: {
@@ -96,11 +96,11 @@ const translations = {
 };
 
 export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
-  const [locale, setLocale] = useState<Locale>("tr");
+  const [locale, setLocale] = useState<Locale>("en");
 
   // Restore the language the user picked on any previous page/visit.
   useEffect(() => {
-    const stored = readStoredLocale();
+    const stored = readStoredLocale(PUBLIC_LOCALES);
     if (stored) setLocale(stored);
   }, []);
 
@@ -117,6 +117,7 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
         <Navbar
           currentLocale={locale}
           onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
+          availableLocales={PUBLIC_LOCALES}
         />
         <main className="flex-1 max-w-3xl mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
           <div className="p-4 bg-red-50 text-red-500 rounded-full mb-6">
@@ -165,6 +166,7 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
       <Navbar
         currentLocale={locale}
         onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
+        availableLocales={PUBLIC_LOCALES}
       />
 
       <main className="flex-1 pt-32 pb-24 max-w-7xl mx-auto px-6 w-full">

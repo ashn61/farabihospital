@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe } from "lucide-react";
 import Link from "next/link";
-import type { Locale } from "@/lib/locale";
+import { ALL_LOCALES, type Locale } from "@/lib/locale";
 
 export type { Locale } from "@/lib/locale";
 
@@ -76,12 +76,23 @@ const translations = {
   }
 };
 
+/** Dil seçicide görünen adlar. Tek kaynak — masaüstü menüsü ve mobil drawer ikisi de bunu kullanır. */
+const LOCALE_LABELS: Record<Locale, string> = {
+  tr: "Türkçe (TR)",
+  en: "English (EN)",
+  ar: "العربية (AR)",
+  ru: "Русский (RU)",
+  ka: "ქართული (KA)",
+};
+
 interface NavbarProps {
   currentLocale: Locale;
   onLocaleChange: (locale: Locale) => void;
+  /** Bu bağlamda sunulacak diller. Varsayılan: beş dil (admin). Public `PUBLIC_LOCALES` geçer. */
+  availableLocales?: readonly Locale[];
 }
 
-export default function Navbar({ currentLocale, onLocaleChange }: NavbarProps) {
+export default function Navbar({ currentLocale, onLocaleChange, availableLocales = ALL_LOCALES }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const t = translations[currentLocale];
@@ -148,36 +159,15 @@ export default function Navbar({ currentLocale, onLocaleChange }: NavbarProps) {
             </button>
             <div className="absolute right-0 top-full pt-1 w-36 hidden group-hover:block transition-all z-50">
               <div className="glass-panel border rounded-xl overflow-hidden shadow-xl">
-                <button
-                  onClick={() => onLocaleChange("tr")}
-                  className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:bg-neutral-105 hover:text-primary cursor-pointer"
-                >
-                  Türkçe (TR)
-                </button>
-                <button
-                  onClick={() => onLocaleChange("en")}
-                  className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:bg-neutral-105 hover:text-primary cursor-pointer"
-                >
-                  English (EN)
-                </button>
-                <button
-                  onClick={() => onLocaleChange("ar")}
-                  className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:bg-neutral-105 hover:text-primary cursor-pointer"
-                >
-                  العربية (AR)
-                </button>
-                <button
-                  onClick={() => onLocaleChange("ru")}
-                  className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:bg-neutral-105 hover:text-primary cursor-pointer"
-                >
-                  Русский (RU)
-                </button>
-                <button
-                  onClick={() => onLocaleChange("ka")}
-                  className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:bg-neutral-105 hover:text-primary cursor-pointer"
-                >
-                  ქართული (KA)
-                </button>
+                {availableLocales.map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => onLocaleChange(lang)}
+                    className="w-full text-left px-4 py-2 text-xs font-bold text-neutral-600 hover:bg-neutral-105 hover:text-primary cursor-pointer"
+                  >
+                    {LOCALE_LABELS[lang]}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -225,7 +215,7 @@ export default function Navbar({ currentLocale, onLocaleChange }: NavbarProps) {
               <div className="flex flex-col space-y-2 pt-2">
                 <span className="text-xs text-slate-500 font-bold">{t.selectLang}</span>
                 <div className="flex flex-wrap gap-2">
-                  {(["tr", "en", "ar", "ru", "ka"] as const).map((lang) => (
+                  {availableLocales.map((lang) => (
                     <button
                       key={lang}
                       onClick={() => {

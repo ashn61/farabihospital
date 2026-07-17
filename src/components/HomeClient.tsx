@@ -24,7 +24,7 @@ import { doctorsData, formatDoctorName } from "@/lib/doctors";
 import { newsData } from "@/lib/news";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
 import { unitLabel, type Unit } from "@/lib/units";
-import { readStoredLocale, storeLocale } from "@/lib/locale";
+import { readStoredLocale, storeLocale, PUBLIC_LOCALES } from "@/lib/locale";
 
 const translations = {
   tr: {
@@ -273,11 +273,11 @@ export default function HomeClient({
   initialNews: typeof newsData;
   initialUnits: Unit[];
 }) {
-  const [locale, setLocale] = useState<Locale>("tr");
+  const [locale, setLocale] = useState<Locale>("en");
 
   // Restore the language the user picked on any previous page/visit.
   useEffect(() => {
-    const stored = readStoredLocale();
+    const stored = readStoredLocale(PUBLIC_LOCALES);
     if (stored) setLocale(stored);
   }, []);
 
@@ -330,6 +330,7 @@ export default function HomeClient({
       <Navbar
         currentLocale={locale}
         onLocaleChange={(l) => { setLocale(l); storeLocale(l); }}
+        availableLocales={PUBLIC_LOCALES}
       />
 
       {/* Hero section */}
