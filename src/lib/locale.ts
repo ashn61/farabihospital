@@ -1,16 +1,29 @@
-import type { Locale } from "@/components/shared/Navbar";
+export type Locale = "tr" | "en" | "ar" | "ru" | "ka";
 
 const STORAGE_KEY = "farabi_locale";
-const VALID: readonly Locale[] = ["tr", "en", "ar", "ru", "ka"];
 
-/** Read the persisted locale from localStorage, or null if none/invalid. */
-export function readStoredLocale(): Locale | null {
-  if (typeof window === "undefined") return null;
-  const value = window.localStorage.getItem(STORAGE_KEY);
-  return value && (VALID as readonly string[]).includes(value) ? (value as Locale) : null;
+/** Admin panelinin sunduğu diller — Türkçe dahil. */
+export const ALL_LOCALES: readonly Locale[] = ["tr", "en", "ar", "ru", "ka"];
+
+/** Public sitenin sunduğu diller — Türkçe yok. */
+export const PUBLIC_LOCALES: readonly Locale[] = ["en", "ar", "ru", "ka"];
+
+/**
+ * Saf seçim: `value` verilen kümede geçerli bir dil mi?
+ * Değilse null — çağıran kendi varsayılanına düşer.
+ */
+export function pickLocale(value: string | null, allowed: readonly Locale[]): Locale | null {
+  if (!value) return null;
+  return (allowed as readonly string[]).includes(value) ? (value as Locale) : null;
 }
 
-/** Persist the chosen locale so it survives navigation and reloads. */
+/** Kayıtlı dili oku; verilen kümede değilse null. */
+export function readStoredLocale(allowed: readonly Locale[] = ALL_LOCALES): Locale | null {
+  if (typeof window === "undefined") return null;
+  return pickLocale(window.localStorage.getItem(STORAGE_KEY), allowed);
+}
+
+/** Seçilen dili kalıcılaştır — gezinme ve yenilemede korunur. */
 export function storeLocale(locale: Locale): void {
   if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, locale);
 }

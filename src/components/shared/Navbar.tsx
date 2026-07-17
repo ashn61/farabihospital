@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe } from "lucide-react";
 import Link from "next/link";
+import type { Locale } from "@/lib/locale";
 
-export type Locale = "tr" | "en" | "ar" | "ru" | "ka";
+export type { Locale } from "@/lib/locale";
 
 const translations = {
   tr: {
