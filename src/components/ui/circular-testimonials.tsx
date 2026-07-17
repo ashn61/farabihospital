@@ -183,10 +183,9 @@ export const CircularTestimonials = ({
     };
   }
 
-  // Framer Motion variants for quote
-  // Opacity-only: the content column is an overflow-y-auto scroller, and a
-  // vertical translate on its child fights the scroll box (it clips the first
-  // line). The per-word blur-in below already carries the motion.
+  // Framer Motion variants for quote.
+  // Keep the y translate: the per-word spans below inherit this parent's
+  // variant labels, and dropping y here leaves them stuck at opacity 0.
   const quoteVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
