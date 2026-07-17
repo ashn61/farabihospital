@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { doctorsData } from "../src/lib/doctors";
 import { newsData } from "../src/lib/news";
 import { doctorToRow } from "../src/lib/data/mappers";
+import type { UnitRecord } from "../src/lib/units";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,10 +14,41 @@ const supabase = createClient(
 );
 
 async function seedDoctors() {
-  const rows = doctorsData.map((doc, i) => doctorToRow(doc, i));
+  // doctorsData birimleri tr adıyla taşıyor (DoctorSeed); DB id'sine burada çevriliyor.
+  const { data: unitRows, error: unitErr } = await supabase
+    .from("units")
+    .select("id,tr,en,ar,ru,ka,type");
+  if (unitErr) throw new Error(`seed doctors: units okunamadı: ${unitErr.message}`);
+  if (!unitRows || unitRows.length === 0) {
+    throw new Error("seed doctors: units tablosu boş — önce birimleri seed et.");
+  }
+  const unitByTr = new Map(unitRows.map((u) => [u.tr as string, u as UnitRecord]));
+
+  /** Seed girdisindeki tr adlarını gerçek birim kayıtlarına çevirir. */
+  const resolveUnits = (unitTr: string[], docName: string): UnitRecord[] =>
+    unitTr.map((tr) => {
+      const unit = unitByTr.get(tr);
+      if (!unit) throw new Error(`seed doctors: "${tr}" birimi units'te yok (${docName})`);
+      return unit;
+    });
+
+  // doctorToRow bir Doctor bekliyor; DoctorSeed'i çözülmüş birimlerle Doctor'a yükseltiyoruz.
+  // Birimler doğru geçmeli — doctorToRow stats_surgeries'i isSurgical üzerinden hesaplıyor.
+  const rows = doctorsData.map((doc, i) =>
+    doctorToRow({ ...doc, units: resolveUnits(doc.unitTr, doc.name) }, i)
+  );
   const { error } = await supabase.from("doctors").upsert(rows, { onConflict: "id" });
   if (error) throw new Error(`seed doctors failed: ${error.message}`);
   console.log(`Seeded ${rows.length} doctors.`);
+
+  const links = doctorsData.flatMap((doc) =>
+    resolveUnits(doc.unitTr, doc.name).map((u) => ({ doctor_id: doc.id, unit_id: u.id }))
+  );
+  const { error: linkErr } = await supabase
+    .from("doctor_units")
+    .upsert(links, { onConflict: "doctor_id,unit_id" });
+  if (linkErr) throw new Error(`seed doctor_units failed: ${linkErr.message}`);
+  console.log(`Seeded ${links.length} doctor_units links.`);
 }
 
 async function seedNews() {

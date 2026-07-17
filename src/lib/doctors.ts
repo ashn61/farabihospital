@@ -1,3 +1,5 @@
+import type { UnitRecord, UnitType } from "@/lib/units";
+
 export function getCleanName(name: string, title?: string): string {
   let clean = name;
   
@@ -83,12 +85,8 @@ export interface Doctor {
   name: string;
   title: string;
   image: string;
-  specialtyTr: string;
-  specialtyEn: string;
-  specialtyAr?: string;
-  specialtyRu: string;
-  specialtyKa: string;
-  category: "surgical" | "internal";
+  /** Hekimin branşları. Ad ve çeviriler yalnızca burada — units tablosundan gelir. */
+  units: UnitRecord[];
   stats: {
     patients: number;
     surgeries?: number;
@@ -105,18 +103,26 @@ export interface Doctor {
   bioKa: string;
 }
 
-export const doctorsData: Doctor[] = [
+/** Statik dizi ve seed girdisi: birimler henüz DB id'sine sahip değil, tr adıyla anılır. */
+export type DoctorSeed = Omit<Doctor, "units"> & { unitTr: string[] };
+
+/** Hekimin birimlerinin tip kümesi — Cerrahi/Dahili sekmesi bunu kullanır. */
+export function doctorTypes(doc: Doctor): Set<UnitType> {
+  return new Set(doc.units.map((u) => u.type));
+}
+
+/** En az bir cerrahi birimi var mı — "Ameliyat sayısı" alanı bunu kullanır. */
+export function isSurgical(doc: Doctor): boolean {
+  return doc.units.some((u) => u.type === "surgical");
+}
+
+export const doctorsData: DoctorSeed[] = [
   {
     id: "4177",
     name: "Prof. Dr. Celal TEKİNBAŞ",
     title: "Prof. Dr.",
     image: "/assets/doctors/celal_tekinbas.jpg",
-    specialtyTr: "Göğüs Cerrahisi Polikliniği",
-    specialtyEn: "Thoracic Surgery",
-    specialtyAr: "جراحة الصدر",
-    specialtyRu: "Торакальная хирургия",
-    specialtyKa: "თორაკალური ქირურგია",
-    category: "surgical",
+    unitTr: ["Göğüs Cerrahisi Polikliniği"],
     stats: { patients: 14200, surgeries: 4500, experience: 28 },
     email: "celal.tekinbas@ktu.edu.tr",
     educationTr: [
@@ -142,12 +148,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Ayşenur BAHADIR",
     title: "Assoc. Prof.",
     image: "/assets/doctors/aysenur_bahadir.jpg",
-    specialtyTr: "Genel Pediatri Polikliniği",
-    specialtyEn: "General Pediatrics",
-    specialtyAr: "طب الأطفال العام",
-    specialtyRu: "Общая педиатрия",
-    specialtyKa: "ზოგადი პედიატრია",
-    category: "internal",
+    unitTr: ["Genel Pediatri Polikliniği"],
     stats: { patients: 9800, experience: 16 },
     email: "aysenur.bahadir@ktu.edu.tr",
     educationTr: [
@@ -173,12 +174,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Bircan SÖNMEZ",
     title: "Assoc. Prof.",
     image: "/assets/doctors/bircan_sonmez.jpg",
-    specialtyTr: "Pediatri Hematoloji ve Onkoloji Polikliniği",
-    specialtyEn: "Pediatric Hematology & Oncology",
-    specialtyAr: "أمراض دم وأورام الأطفال",
-    specialtyRu: "Детская гематология и онкология",
-    specialtyKa: "ბავშვთა ჰემატოლოგია და ონკოლოგია",
-    category: "internal",
+    unitTr: ["Pediatri Hematoloji ve Onkoloji Polikliniği"],
     stats: { patients: 5400, experience: 14 },
     email: "bircan.sonmez@ktu.edu.tr",
     educationTr: [
@@ -199,12 +195,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Deniz AKSU ARICA",
     title: "Assoc. Prof.",
     image: "/assets/doctors/deniz_aksu_arica.jpg",
-    specialtyTr: "Cildiye Polikliniği",
-    specialtyEn: "Dermatology",
-    specialtyAr: "الجلدية",
-    specialtyRu: "Дерматология",
-    specialtyKa: "დერმატოლოგია",
-    category: "internal",
+    unitTr: ["Cildiye Polikliniği"],
     stats: { patients: 11200, experience: 15 },
     email: "deniz.arica@ktu.edu.tr",
     educationTr: [
@@ -225,12 +216,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Elif ACAR ARSLAN",
     title: "Assoc. Prof.",
     image: "/assets/doctors/elif_acar_arslan.png",
-    specialtyTr: "Pediatri Nöroloji Polikliniği",
-    specialtyEn: "Pediatric Neurology",
-    specialtyAr: "أعصاب الأطفال",
-    specialtyRu: "Детская неврология",
-    specialtyKa: "ბავშვთა ნევროლოგია",
-    category: "internal",
+    unitTr: ["Pediatri Nöroloji Polikliniği"],
     stats: { patients: 7600, experience: 14 },
     email: "elif.acar@ktu.edu.tr",
     educationTr: [
@@ -253,12 +239,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Hatice Bengü YALDIZ ÇOBANOĞLU",
     title: "Assoc. Prof.",
     image: "/assets/doctors/bengu_cobanoglu.jpg",
-    specialtyTr: "Kulak-Burun-Boğaz Polikliniği",
-    specialtyEn: "Otorhinolaryngology (ENT)",
-    specialtyAr: "أنف وأذن وحنجرة",
-    specialtyRu: "Оториноларингология (ЛОР)",
-    specialtyKa: "ყელ-ყურ-ცხვირი",
-    category: "surgical",
+    unitTr: ["Kulak-Burun-Boğaz Polikliniği"],
     stats: { patients: 8400, surgeries: 1900, experience: 13 },
     email: "bengu.cobanoglu@ktu.edu.tr",
     educationTr: [
@@ -279,12 +260,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Selçuk ARSLAN",
     title: "Assoc. Prof.",
     image: "/assets/doctors/selcuk_arslan.jpg",
-    specialtyTr: "Tıbbi Genetik Polikliniği",
-    specialtyEn: "Medical Genetics",
-    specialtyAr: "الوراثة الطبية",
-    specialtyRu: "Медицинская генетика",
-    specialtyKa: "სამედიცინო გენეტიკა",
-    category: "internal",
+    unitTr: ["Tıbbi Genetik Polikliniği"],
     stats: { patients: 4800, experience: 12 },
     email: "selcuk.arslan@ktu.edu.tr",
     educationTr: [
@@ -305,12 +281,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. İlke Onur KAZAZ",
     title: "Assoc. Prof.",
     image: "/assets/doctors/onur_kazaz.png",
-    specialtyTr: "Üroloji Polikliniği",
-    specialtyEn: "Urology",
-    specialtyAr: "المسالك البولية",
-    specialtyRu: "Урология",
-    specialtyKa: "უროლოგია",
-    category: "surgical",
+    unitTr: ["Üroloji Polikliniği"],
     stats: { patients: 9200, surgeries: 2600, experience: 15 },
     email: "onur.kazaz@ktu.edu.tr",
     educationTr: [
@@ -331,12 +302,7 @@ export const doctorsData: Doctor[] = [
     name: "Asst. Prof. Fatih ÇOLAK",
     title: "Asst. Prof.",
     image: "/assets/doctors/fatih_colak.jpg",
-    specialtyTr: "Göğüs Cerrahisi Polikliniği",
-    specialtyEn: "Thoracic Surgery",
-    specialtyAr: "جراحة الصدر",
-    specialtyRu: "Торакальная хирургия",
-    specialtyKa: "თორაკალური ქირურგია",
-    category: "surgical",
+    unitTr: ["Göğüs Cerrahisi Polikliniği"],
     stats: { patients: 5100, surgeries: 1200, experience: 10 },
     email: "fatih.colak@ktu.edu.tr",
     educationTr: [
@@ -357,12 +323,7 @@ export const doctorsData: Doctor[] = [
     name: "Asst. Prof. Kerim ÖNER",
     title: "Asst. Prof.",
     image: "/assets/doctors/kerim_oner.jpg",
-    specialtyTr: "Genel Pediatri Polikliniği",
-    specialtyEn: "General Pediatrics",
-    specialtyAr: "طب الأطفال العام",
-    specialtyRu: "Общая педиатрия",
-    specialtyKa: "ზოგადი პედიატრია",
-    category: "internal",
+    unitTr: ["Genel Pediatri Polikliniği"],
     stats: { patients: 6300, experience: 9 },
     email: "kerim.oner@ktu.edu.tr",
     educationTr: [
@@ -383,12 +344,7 @@ export const doctorsData: Doctor[] = [
     name: "Asst. Prof. Leyla BAYKAL SELÇUK",
     title: "Asst. Prof.",
     image: "/assets/doctors/leyla_baykal_selcuk.png",
-    specialtyTr: "Cildiye Polikliniği",
-    specialtyEn: "Dermatology",
-    specialtyAr: "الجلدية",
-    specialtyRu: "Дерматология",
-    specialtyKa: "დერმატოლოგია",
-    category: "internal",
+    unitTr: ["Cildiye Polikliniği"],
     stats: { patients: 7800, experience: 11 },
     email: "leyla.baykal@ktu.edu.tr",
     educationTr: [
@@ -409,12 +365,7 @@ export const doctorsData: Doctor[] = [
     name: "Asst. Prof. Mürsel ŞAHİN",
     title: "Asst. Prof.",
     image: "/assets/doctors/mursel_sahin.jpg",
-    specialtyTr: "Kardiyoloji Polikliniği",
-    specialtyEn: "Cardiology",
-    specialtyAr: "أمراض القلب",
-    specialtyRu: "Кардиология",
-    specialtyKa: "კარდიოლოგია",
-    category: "internal",
+    unitTr: ["Kardiyoloji Polikliniği"],
     stats: { patients: 8200, experience: 12 },
     email: "mursel.sahin@ktu.edu.tr",
     educationTr: [
@@ -435,12 +386,7 @@ export const doctorsData: Doctor[] = [
     name: "Asst. Prof. Seher Nazlı KAZAZ",
     title: "Asst. Prof.",
     image: "/assets/doctors/seher_nazli_kazaz.jpg",
-    specialtyTr: "Göğüs Hastalıkları Polikliniği",
-    specialtyEn: "Pulmonology (Chest Diseases)",
-    specialtyAr: "أمراض الصدر",
-    specialtyRu: "Пульмонология",
-    specialtyKa: "პულმონოლოგია",
-    category: "internal",
+    unitTr: ["Göğüs Hastalıkları Polikliniği"],
     stats: { patients: 5900, experience: 10 },
     email: "seher.kazaz@ktu.edu.tr",
     educationTr: [
@@ -461,12 +407,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Abdülcemal Ümit IŞIK",
     title: "Prof. Dr.",
     image: "/assets/doctors/abdulcemal_umit_isik.jpg",
-    specialtyTr: "Gastroenteroloji Polikliniği",
-    specialtyEn: "Gastroenterology",
-    specialtyAr: "أمراض الجهاز الهضمي",
-    specialtyRu: "Гастроэнтерология",
-    specialtyKa: "გასტროენტეროლოგია",
-    category: "internal",
+    unitTr: ["Gastroenteroloji Polikliniği"],
     stats: { patients: 15400, experience: 29 },
     email: "umit.isik@ktu.edu.tr",
     educationTr: [
@@ -487,12 +428,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Adnan ÇALIK",
     title: "Prof. Dr.",
     image: "/assets/doctors/adnan_calik.jpg",
-    specialtyTr: "Genel Cerrahi Polikliniği",
-    specialtyEn: "General Surgery",
-    specialtyAr: "الجراحة العامة",
-    specialtyRu: "Общая хирургия",
-    specialtyKa: "ზოგადი ქირურგია",
-    category: "surgical",
+    unitTr: ["Genel Cerrahi Polikliniği"],
     stats: { patients: 12100, surgeries: 3900, experience: 27 },
     email: "adnan.calik@ktu.edu.tr",
     educationTr: [
@@ -513,12 +449,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Ahmet Coşkun ÖZDEMİR",
     title: "Prof. Dr.",
     image: "/assets/doctors/ahmet_coskun_ozdemir.jpg",
-    specialtyTr: "Dahiliye Polikliniği",
-    specialtyEn: "Internal Medicine",
-    specialtyAr: "الطب الباطني",
-    specialtyRu: "Терапия",
-    specialtyKa: "შინაგანი მედიცინა",
-    category: "internal",
+    unitTr: ["Dahiliye Polikliniği"],
     stats: { patients: 18900, experience: 32 },
     email: "coskun.ozdemir@ktu.edu.tr",
     educationTr: [
@@ -539,12 +470,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Atila TÜRKYILMAZ",
     title: "Prof. Dr.",
     image: "/assets/doctors/atila_turkyilmaz.jpg",
-    specialtyTr: "Göğüs Cerrahisi Polikliniği",
-    specialtyEn: "Thoracic Surgery",
-    specialtyAr: "جراحة الصدر",
-    specialtyRu: "Торакальная хирургия",
-    specialtyKa: "თორაკალური ქირურგია",
-    category: "surgical",
+    unitTr: ["Göğüs Cerrahisi Polikliniği"],
     stats: { patients: 11000, surgeries: 3800, experience: 24 },
     email: "atila.turkyilmaz@ktu.edu.tr",
     educationTr: [
@@ -565,12 +491,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Erhan ARSLAN",
     title: "Prof. Dr.",
     image: "/assets/doctors/erhan_arslan.jpg",
-    specialtyTr: "Beyin Cerrahi Polikliniği",
-    specialtyEn: "Neurosurgery",
-    specialtyAr: "جراحة الأعصاب",
-    specialtyRu: "Нейрохирургия",
-    specialtyKa: "ნეიროქირურგია",
-    category: "surgical",
+    unitTr: ["Beyin Cerrahi Polikliniği"],
     stats: { patients: 10400, surgeries: 3100, experience: 22 },
     email: "erhan.arslan@ktu.edu.tr",
     educationTr: [
@@ -591,12 +512,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Erol ERDURAN",
     title: "Prof. Dr.",
     image: "/assets/doctors/erol_erduran.jpg",
-    specialtyTr: "Pediatri Hematoloji ve Onkoloji Polikliniği",
-    specialtyEn: "Pediatric Hematology & Oncology",
-    specialtyAr: "أمراض دم وأورام الأطفال",
-    specialtyRu: "Детская гематология и онкология",
-    specialtyKa: "ბავშვთა ჰემატოლოგია და ონკოლოგია",
-    category: "internal",
+    unitTr: ["Pediatri Hematoloji ve Onkoloji Polikliniği"],
     stats: { patients: 13900, experience: 28 },
     email: "erol.erduran@ktu.edu.tr",
     educationTr: [
@@ -617,12 +533,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Ersagun KARAGÜZEL",
     title: "Prof. Dr.",
     image: "/assets/doctors/ersagun_karaguzel.jpg",
-    specialtyTr: "Çocuk Ürolojisi Polikliniği",
-    specialtyEn: "Pediatric Urology",
-    specialtyAr: "مسالك بولية الأطفال",
-    specialtyRu: "Детская урология",
-    specialtyKa: "ბავშვთა უროლოგია",
-    category: "surgical",
+    unitTr: ["Çocuk Ürolojisi Polikliniği"],
     stats: { patients: 9500, surgeries: 2800, experience: 19 },
     email: "ersagun.karaguzel@ktu.edu.tr",
     educationTr: [
@@ -643,12 +554,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Ertuğrul ÇAKIR",
     title: "Prof. Dr.",
     image: "/assets/doctors/ertugrul_cakir.png",
-    specialtyTr: "Beyin Cerrahi Polikliniği",
-    specialtyEn: "Neurosurgery",
-    specialtyAr: "جراحة الأعصاب",
-    specialtyRu: "Нейрохирургия",
-    specialtyKa: "ნეიროქირურგია",
-    category: "surgical",
+    unitTr: ["Beyin Cerrahi Polikliniği"],
     stats: { patients: 11500, surgeries: 3400, experience: 25 },
     email: "ertugrul.cakir@ktu.edu.tr",
     educationTr: [
@@ -669,12 +575,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Fazıl ORHAN",
     title: "Prof. Dr.",
     image: "/assets/doctors/fazil_orhan.jpg",
-    specialtyTr: "Pediatri İmmünoloji ve Alerji Polikliniği",
-    specialtyEn: "Pediatric Immunology & Allergy",
-    specialtyAr: "مناعة وحساسية الأطفال",
-    specialtyRu: "Детская иммунология и аллергология",
-    specialtyKa: "ბავშვთა იმუნოლოგია და ალერგია",
-    category: "internal",
+    unitTr: ["Pediatri İmmünoloji ve Alerji Polikliniği"],
     stats: { patients: 14700, experience: 24 },
     email: "fazil.orhan@ktu.edu.tr",
     educationTr: [
@@ -695,12 +596,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Hidayet ERDÖL",
     title: "Prof. Dr.",
     image: "/assets/doctors/hidayet_erdol.jpg",
-    specialtyTr: "Göz Polikliniği",
-    specialtyEn: "Ophthalmology",
-    specialtyAr: "طب العيون",
-    specialtyRu: "Офтальмология",
-    specialtyKa: "ოფთალმოლოგია",
-    category: "surgical",
+    unitTr: ["Göz Polikliniği"],
     stats: { patients: 17200, surgeries: 5200, experience: 28 },
     email: "hidayet.erdol@ktu.edu.tr",
     educationTr: [
@@ -721,12 +617,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Mehmet SÖNMEZ",
     title: "Prof. Dr.",
     image: "/assets/doctors/mehmet_sonmez.jpg",
-    specialtyTr: "Hematoloji Polikliniği",
-    specialtyEn: "Hematology",
-    specialtyAr: "أمراض الدم",
-    specialtyRu: "Гематология",
-    specialtyKa: "ჰემატოლოგია",
-    category: "internal",
+    unitTr: ["Hematoloji Polikliniği"],
     stats: { patients: 16100, experience: 26 },
     email: "mehmet.sonmez@ktu.edu.tr",
     educationTr: [
@@ -747,12 +638,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Merih KUTLU",
     title: "Prof. Dr.",
     image: "/assets/doctors/merih_kutlu.png",
-    specialtyTr: "Kardiyoloji Polikliniği",
-    specialtyEn: "Cardiology",
-    specialtyAr: "أمراض القلب",
-    specialtyRu: "Кардиология",
-    specialtyKa: "კარდიოლოგია",
-    category: "internal",
+    unitTr: ["Kardiyoloji Polikliniği"],
     stats: { patients: 19500, experience: 30 },
     email: "merih.kutlu@ktu.edu.tr",
     educationTr: [
@@ -773,12 +659,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Muhammet URALOĞLU",
     title: "Prof. Dr.",
     image: "/assets/doctors/muhammet_uraloglu.jpg",
-    specialtyTr: "Plastik Cerrahi Polikliniği",
-    specialtyEn: "Plastic Surgery",
-    specialtyAr: "الجراحة التجميلية",
-    specialtyRu: "Пластическая хирургия",
-    specialtyKa: "პლასტიკური ქირურგია",
-    category: "surgical",
+    unitTr: ["Plastik Cerrahi Polikliniği"],
     stats: { patients: 8100, surgeries: 3200, experience: 18 },
     email: "muhammet.uraloglu@ktu.edu.tr",
     educationTr: [
@@ -799,12 +680,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Murat ÇAKIR",
     title: "Prof. Dr.",
     image: "/assets/doctors/murat_cakir.jpg",
-    specialtyTr: "Pediatri Gastroenteroloji Polikliniği",
-    specialtyEn: "Pediatric Gastroenterology",
-    specialtyAr: "جهاز هضمي الأطفال",
-    specialtyRu: "Детская гастроэнтерология",
-    specialtyKa: "ბავშვთა გასტროენტეროლოგია",
-    category: "internal",
+    unitTr: ["Pediatri Gastroenteroloji Polikliniği"],
     stats: { patients: 11200, experience: 20 },
     email: "murat.cakir@ktu.edu.tr",
     educationTr: [
@@ -825,12 +701,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Murat LİVAOĞLU",
     title: "Prof. Dr.",
     image: "/assets/doctors/murat_livaoglu.jpg",
-    specialtyTr: "Plastik Cerrahi Polikliniği",
-    specialtyEn: "Plastic Surgery",
-    specialtyAr: "الجراحة التجميلية",
-    specialtyRu: "Пластическая хирургия",
-    specialtyKa: "პლასტიკური ქირურგია",
-    category: "surgical",
+    unitTr: ["Plastik Cerrahi Polikliniği"],
     stats: { patients: 9800, surgeries: 3700, experience: 21 },
     email: "murat.livaoglu@ktu.edu.tr",
     educationTr: [
@@ -851,12 +722,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Mustafa İMAMOĞLU",
     title: "Prof. Dr.",
     image: "/assets/doctors/mustafa_imamoglu.png",
-    specialtyTr: "Çocuk Cerrahisi Polikliniği",
-    specialtyEn: "Pediatric Surgery",
-    specialtyAr: "جراحة الأطفال",
-    specialtyRu: "Детская хирургия",
-    specialtyKa: "ბავშვთა ქირურგია",
-    category: "surgical",
+    unitTr: ["Çocuk Cerrahisi Polikliniği"],
     stats: { patients: 13200, surgeries: 4100, experience: 26 },
     email: "mustafa.imamoglu@ktu.edu.tr",
     educationTr: [
@@ -877,12 +743,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Ömer GEDİKLİ",
     title: "Prof. Dr.",
     image: "/assets/doctors/omer_gedikli.jpg",
-    specialtyTr: "Kulak-Burun-Boğaz Polikliniği",
-    specialtyEn: "Otorhinolaryngology (ENT)",
-    specialtyAr: "أنف وأذن وحنجرة",
-    specialtyRu: "Оториноларингология (ЛОР)",
-    specialtyKa: "ყელ-ყურ-ცხვირი",
-    category: "surgical",
+    unitTr: ["Kulak-Burun-Boğaz Polikliniği"],
     stats: { patients: 14000, surgeries: 3900, experience: 23 },
     email: "omer.gedikli@ktu.edu.tr",
     educationTr: [
@@ -903,12 +764,7 @@ export const doctorsData: Doctor[] = [
     name: "Assoc. Prof. Selçuk ARSLAN",
     title: "Assoc. Prof.",
     image: "/assets/doctors/selcuk_arslan.jpg",
-    specialtyTr: "Tıbbi Genetik Polikliniği",
-    specialtyEn: "Medical Genetics",
-    specialtyAr: "الوراثة الطبية",
-    specialtyRu: "Медицинская генетика",
-    specialtyKa: "სამედიცინო გენეტიკა",
-    category: "internal",
+    unitTr: ["Tıbbi Genetik Polikliniği"],
     stats: { patients: 4800, experience: 12 },
     email: "selcuk.arslan@ktu.edu.tr",
     educationTr: ["KTÜ Tıp Fakültesi"],
@@ -923,12 +779,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Selçuk KAYA",
     title: "Prof. Dr.",
     image: "/assets/doctors/selcuk_kaya.png",
-    specialtyTr: "Enfeksiyon Polikliniği",
-    specialtyEn: "Infectious Diseases",
-    specialtyAr: "الأمراض المعدية",
-    specialtyRu: "Инфекционные болезни",
-    specialtyKa: "ინფექციური დაავადებები",
-    category: "internal",
+    unitTr: ["Enfeksiyon Polikliniği"],
     stats: { patients: 16800, experience: 24 },
     email: "selcuk.kaya@ktu.edu.tr",
     educationTr: [
@@ -949,12 +800,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Serdar TÜRKYILMAZ",
     title: "Prof. Dr.",
     image: "/assets/doctors/serdar_turkyilmaz.jpg",
-    specialtyTr: "Genel Cerrahi Polikliniği",
-    specialtyEn: "General Surgery",
-    specialtyAr: "الجراحة العامة",
-    specialtyRu: "Общая хирургия",
-    specialtyKa: "ზოგადი ქირურგია",
-    category: "surgical",
+    unitTr: ["Genel Cerrahi Polikliniği"],
     stats: { patients: 14800, surgeries: 4300, experience: 26 },
     email: "serdar.turkyilmaz@ktu.edu.tr",
     educationTr: [
@@ -975,12 +821,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Süleyman BAYKAL",
     title: "Prof. Dr.",
     image: "/assets/doctors/suleyman_baykal.jpg",
-    specialtyTr: "Beyin Cerrahi Polikliniği",
-    specialtyEn: "Neurosurgery",
-    specialtyAr: "جراحة الأعصاب",
-    specialtyRu: "Нейрохирургия",
-    specialtyKa: "ნეიროქირურგია",
-    category: "surgical",
+    unitTr: ["Beyin Cerrahi Polikliniği"],
     stats: { patients: 18400, surgeries: 4900, experience: 31 },
     email: "suleyman.baykal@ktu.edu.tr",
     educationTr: [
@@ -1001,12 +842,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Süleyman GUVEN",
     title: "Prof. Dr.",
     image: "/assets/doctors/suleyman_guven.png",
-    specialtyTr: "Kadın-Doğum Polikliniği",
-    specialtyEn: "Obstetrics & Gynecology",
-    specialtyAr: "النساء والتوليد",
-    specialtyRu: "Акушерство и гинекология",
-    specialtyKa: "მეანობა-გინეკოლოგია",
-    category: "surgical",
+    unitTr: ["Kadın-Doğum Polikliniği"],
     stats: { patients: 15900, surgeries: 3800, experience: 25 },
     email: "suleyman.guven@ktu.edu.tr",
     educationTr: [
@@ -1027,12 +863,7 @@ export const doctorsData: Doctor[] = [
     name: "Prof. Dr. Yılmaz BÜLBÜL",
     title: "Prof. Dr.",
     image: "/assets/doctors/yilmaz_bulbul.jpg",
-    specialtyTr: "Göğüs Hastalıkları Polikliniği",
-    specialtyEn: "Pulmonology (Chest Diseases)",
-    specialtyAr: "أمراض الصدر",
-    specialtyRu: "Пульмонология",
-    specialtyKa: "პულმონოლოგია",
-    category: "internal",
+    unitTr: ["Göğüs Hastalıkları Polikliniği"],
     stats: { patients: 19800, experience: 28 },
     email: "yilmaz.bulbul@ktu.edu.tr",
     educationTr: [

@@ -1,18 +1,34 @@
 import { describe, it, expect } from "vitest";
-import { rowToDoctor, doctorToRow, rowsToNewsData, type DoctorRow, type NewsRow } from "./mappers";
+import { rowToDoctor, doctorToRow, rowsToNewsData, type DoctorRow, type NewsRow, type UnitRow } from "./mappers";
 import type { Doctor } from "@/lib/doctors";
+
+const surgicalUnitRow: UnitRow = {
+  id: "unit-1",
+  tr: "Göğüs Cerrahisi Polikliniği",
+  en: "Thoracic Surgery",
+  ar: "جراحة الصدر",
+  ru: "Торакальная хирургия",
+  ka: "თორაკალური ქირურგია",
+  type: "surgical",
+  sort_order: 0,
+};
+
+const internalUnitRow: UnitRow = {
+  id: "unit-2",
+  tr: "Dahiliye Polikliniği",
+  en: "Internal Medicine",
+  ar: "الطب الباطني",
+  ru: "Терапия",
+  ka: "შინაგანი მედიცინა",
+  type: "internal",
+  sort_order: 1,
+};
 
 const sampleRow: DoctorRow = {
   id: "4177",
   name: "Celal TEKİNBAŞ",
   title: "Prof. Dr.",
   image: "/assets/doctors/celal_tekinbas.jpg",
-  specialty_tr: "Göğüs Cerrahisi",
-  specialty_en: "Thoracic Surgery",
-  specialty_ar: "جراحة الصدر",
-  specialty_ru: "Торакальная хирургия",
-  specialty_ka: "თორაკალური ქირურგია",
-  category: "surgical",
   stats_patients: 14200,
   stats_experience: 28,
   stats_surgeries: 4500,
@@ -22,16 +38,38 @@ const sampleRow: DoctorRow = {
   education_ar: null,
   bio_tr: "tr", bio_en: "en", bio_ar: null, bio_ru: "ru", bio_ka: "ka",
   sort_order: 0,
+  doctor_units: [{ units: surgicalUnitRow }],
 };
 
 describe("rowToDoctor", () => {
   it("maps snake_case columns into the Doctor shape", () => {
     const doc = rowToDoctor(sampleRow);
     expect(doc.id).toBe("4177");
-    expect(doc.specialtyTr).toBe("Göğüs Cerrahisi");
     expect(doc.stats).toEqual({ patients: 14200, experience: 28, surgeries: 4500 });
     expect(doc.educationTr).toEqual(["KTÜ"]);
-    expect(doc.category).toBe("surgical");
+  });
+
+  it("flattens the doctor_units nested select into units", () => {
+    const doc = rowToDoctor({
+      ...sampleRow,
+      doctor_units: [{ units: surgicalUnitRow }, { units: internalUnitRow }],
+    });
+    expect(doc.units.map((u) => u.id)).toEqual(["unit-1", "unit-2"]);
+    expect(doc.units[0]).toEqual({
+      id: "unit-1",
+      tr: "Göğüs Cerrahisi Polikliniği",
+      en: "Thoracic Surgery",
+      ar: "جراحة الصدر",
+      ru: "Торакальная хирургия",
+      ka: "თორაკალური ქირურგია",
+      type: "surgical",
+    });
+  });
+
+  it("yields an empty units array when there are no links", () => {
+    expect(rowToDoctor({ ...sampleRow, doctor_units: [] }).units).toEqual([]);
+    expect(rowToDoctor({ ...sampleRow, doctor_units: null }).units).toEqual([]);
+    expect(rowToDoctor({ ...sampleRow, doctor_units: [{ units: null }] }).units).toEqual([]);
   });
 
   it("turns null optional columns into undefined", () => {
@@ -45,16 +83,28 @@ describe("doctorToRow", () => {
   it("round-trips a Doctor back to a row", () => {
     const doc: Doctor = rowToDoctor(sampleRow);
     const row = doctorToRow(doc, 5);
-    expect(row.specialty_tr).toBe("Göğüs Cerrahisi");
+    expect(row.name).toBe("Celal TEKİNBAŞ");
     expect(row.stats_surgeries).toBe(4500);
     expect(row.sort_order).toBe(5);
     expect(row.bio_ar).toBeNull();
   });
 
-  it("sets stats_surgeries to null for internal doctors", () => {
-    const doc = rowToDoctor({ ...sampleRow, category: "internal", stats_surgeries: null });
+  it("sets stats_surgeries to null for a doctor with no surgical unit", () => {
+    const doc = rowToDoctor({
+      ...sampleRow,
+      stats_surgeries: null,
+      doctor_units: [{ units: internalUnitRow }],
+    });
     const row = doctorToRow(doc);
     expect(row.stats_surgeries).toBeNull();
+  });
+
+  it("keeps stats_surgeries when at least one unit is surgical", () => {
+    const doc = rowToDoctor({
+      ...sampleRow,
+      doctor_units: [{ units: internalUnitRow }, { units: surgicalUnitRow }],
+    });
+    expect(doctorToRow(doc).stats_surgeries).toBe(4500);
   });
 
   it("writes null stats_surgeries for a surgical doctor with no surgeries value", () => {

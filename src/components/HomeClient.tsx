@@ -20,10 +20,10 @@ import Navbar, { Locale } from "@/components/shared/Navbar";
 import Hero from "@/components/sections/Hero";
 import Footer from "@/components/shared/Footer";
 import ChatWidget from "@/components/shared/ChatWidget";
-import { doctorsData, formatDoctorName } from "@/lib/doctors";
+import { formatDoctorName, doctorTypes, type Doctor } from "@/lib/doctors";
 import { newsData } from "@/lib/news";
 import { CircularTestimonials } from "@/components/ui/circular-testimonials";
-import { unitLabel, type Unit } from "@/lib/units";
+import { unitLabel, type UnitRecord } from "@/lib/units";
 import { readStoredLocale, storeLocale, PUBLIC_LOCALES } from "@/lib/locale";
 
 const translations = {
@@ -269,9 +269,9 @@ export default function HomeClient({
   initialNews,
   initialUnits,
 }: {
-  initialDoctors: typeof doctorsData;
+  initialDoctors: Doctor[];
   initialNews: typeof newsData;
-  initialUnits: Unit[];
+  initialUnits: UnitRecord[];
 }) {
   const [locale, setLocale] = useState<Locale>("en");
 
@@ -284,7 +284,7 @@ export default function HomeClient({
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
-  const [doctors, setDoctors] = useState<typeof doctorsData>(initialDoctors);
+  const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
   const [news, setNews] = useState<typeof newsData>(initialNews);
 
   const surgicalSpecialties = initialUnits.filter((u) => u.type === "surgical");
@@ -295,7 +295,7 @@ export default function HomeClient({
   // Doctors filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<"all" | "surgical" | "internal">("all");
-  const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
 
   // Specialties active tab state
   const [specialtiesTab, setSpecialtiesTab] = useState<"surgical" | "internal">("surgical");
@@ -305,24 +305,23 @@ export default function HomeClient({
 
 
 
-  // Filtered doctors based on search query and category tab
+  // Filtered doctors based on search query, category tab and unit chip
   const filteredDoctors = doctors.filter((doc) => {
-    const matchesCategory = activeCategory === "all" || doc.category === activeCategory;
+    const matchesCategory = activeCategory === "all" || doctorTypes(doc).has(activeCategory);
 
-    const matchesUnit = !selectedUnit || doc.specialtyTr === selectedUnit;
+    const matchesUnit = !selectedUnitId || doc.units.some((u) => u.id === selectedUnitId);
 
     const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
       doc.name.toLowerCase().includes(searchLower) ||
-      doc.specialtyTr.toLowerCase().includes(searchLower) ||
-      doc.specialtyEn.toLowerCase().includes(searchLower) ||
-      doc.specialtyRu.toLowerCase().includes(searchLower) ||
-      doc.specialtyKa.toLowerCase().includes(searchLower);
+      doc.units.some((u) =>
+        [u.tr, u.en, u.ar, u.ru, u.ka].some((label) => label.toLowerCase().includes(searchLower))
+      );
 
     return matchesCategory && matchesUnit && matchesSearch;
   });
 
-  const selectedUnitObj = selectedUnit ? initialUnits.find((u) => u.tr === selectedUnit) : null;
+  const selectedUnitObj = selectedUnitId ? initialUnits.find((u) => u.id === selectedUnitId) : null;
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background" style={{ direction: isRtl ? "rtl" : "ltr" }}>
@@ -476,7 +475,7 @@ export default function HomeClient({
                       <a
                         href="#doctors"
                         onClick={() => {
-                          setSelectedUnit(spec.tr);
+                          setSelectedUnitId(spec.id);
                           setSearchQuery("");
                           setActiveCategory(spec.type);
                         }}
@@ -518,7 +517,7 @@ export default function HomeClient({
                       <a
                         href="#doctors"
                         onClick={() => {
-                          setSelectedUnit(spec.tr);
+                          setSelectedUnitId(spec.id);
                           setSearchQuery("");
                           setActiveCategory(spec.type);
                         }}
@@ -555,7 +554,7 @@ export default function HomeClient({
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setSelectedUnit(null); }}
+                onChange={(e) => { setSearchQuery(e.target.value); setSelectedUnitId(null); }}
                 placeholder={t.searchPlaceholder}
                 className="w-full pl-12 pr-4 py-3.5 bg-white border border-neutral-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none rounded-2xl text-xs font-bold transition-all shadow-2xs"
               />
@@ -564,7 +563,7 @@ export default function HomeClient({
             {/* Specialty category selectors */}
             <div className="flex flex-wrap gap-2 items-center bg-slate-100 p-1.5 rounded-2xl">
               <button
-                onClick={() => { setActiveCategory("all"); setSelectedUnit(null); }}
+                onClick={() => { setActiveCategory("all"); setSelectedUnitId(null); }}
                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeCategory === "all"
                   ? "bg-primary text-white shadow-xs"
                   : "text-slate-500 hover:text-primary"
@@ -573,7 +572,7 @@ export default function HomeClient({
                 {t.allCategories}
               </button>
               <button
-                onClick={() => { setActiveCategory("surgical"); setSelectedUnit(null); }}
+                onClick={() => { setActiveCategory("surgical"); setSelectedUnitId(null); }}
                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeCategory === "surgical"
                   ? "bg-primary text-white shadow-xs"
                   : "text-slate-500 hover:text-primary"
@@ -582,7 +581,7 @@ export default function HomeClient({
                 {t.filterSurgical}
               </button>
               <button
-                onClick={() => { setActiveCategory("internal"); setSelectedUnit(null); }}
+                onClick={() => { setActiveCategory("internal"); setSelectedUnitId(null); }}
                 className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeCategory === "internal"
                   ? "bg-primary text-white shadow-xs"
                   : "text-slate-500 hover:text-primary"
@@ -599,7 +598,7 @@ export default function HomeClient({
               <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/20 text-primary rounded-full pl-4 pr-2 py-1.5">
                 <span className="text-[11px] font-black">{unitLabel(selectedUnitObj, locale)}</span>
                 <button
-                  onClick={() => setSelectedUnit(null)}
+                  onClick={() => setSelectedUnitId(null)}
                   className="p-1 rounded-full hover:bg-primary/10 transition-colors cursor-pointer"
                   aria-label="Birim filtresini kaldır"
                 >
@@ -617,13 +616,6 @@ export default function HomeClient({
             <AnimatePresence mode="popLayout">
               {filteredDoctors.length > 0 ? (
                 filteredDoctors.map((doc) => {
-                  const spec =
-                    locale === "tr" ? doc.specialtyTr :
-                    locale === "en" ? doc.specialtyEn :
-                    locale === "ar" ? (doc.specialtyAr || doc.specialtyEn) :
-                    locale === "ru" ? doc.specialtyRu :
-                    doc.specialtyKa;
-
                   return (
                     <motion.div
                       layout
@@ -650,15 +642,22 @@ export default function HomeClient({
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
                             <span className="text-[9px] font-black text-secondary uppercase tracking-widest">
-                              {doc.category === "surgical" ? t.filterSurgical : t.filterInternal}
+                              {doctorTypes(doc).has("surgical") ? t.filterSurgical : t.filterInternal}
                             </span>
                           </div>
                           <h4 className="text-sm font-black text-primary leading-tight mt-1 truncate">
                             {formatDoctorName(doc.name, doc.title, locale)}
                           </h4>
-                          <p className="text-[11px] text-neutral-400 font-semibold line-clamp-2 min-h-[2rem]">
-                            {spec}
-                          </p>
+                          <div className="flex flex-wrap gap-1 min-h-[2rem] content-start">
+                            {doc.units.map((u) => (
+                              <span
+                                key={u.id}
+                                className="text-[10px] font-semibold text-neutral-500 bg-neutral-100 border border-neutral-200/60 rounded-full px-2 py-0.5"
+                              >
+                                {unitLabel(u, locale)}
+                              </span>
+                            ))}
+                          </div>
                         </div>
 
                         {/* Direct Link to detail pages */}

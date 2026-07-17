@@ -1,4 +1,4 @@
-import type { Doctor } from "@/lib/doctors";
+import { isSurgical, type Doctor } from "@/lib/doctors";
 import type { NewsItem, NewsData } from "@/lib/news";
 import type { UnitRecord } from "@/lib/units";
 
@@ -10,12 +10,6 @@ export interface DoctorRow {
   name: string;
   title: string;
   image: string;
-  specialty_tr: string;
-  specialty_en: string;
-  specialty_ar: string | null;
-  specialty_ru: string;
-  specialty_ka: string;
-  category: "surgical" | "internal";
   stats_patients: number;
   stats_experience: number;
   stats_surgeries: number | null;
@@ -29,6 +23,8 @@ export interface DoctorRow {
   bio_ru: string;
   bio_ka: string;
   sort_order: number;
+  /** Supabase nested select: doctor_units(units(*)) */
+  doctor_units?: { units: UnitRow | null }[] | null;
 }
 
 export interface NewsRow {
@@ -58,17 +54,17 @@ export function rowToUnitRecord(row: UnitRow): UnitRecord {
 }
 
 export function rowToDoctor(row: DoctorRow): Doctor {
+  const units = (row.doctor_units ?? [])
+    .map((du) => du.units)
+    .filter((u): u is UnitRow => u !== null)
+    .map(rowToUnitRecord);
+
   return {
     id: row.id,
     name: row.name,
     title: row.title,
     image: row.image,
-    specialtyTr: row.specialty_tr,
-    specialtyEn: row.specialty_en,
-    specialtyAr: row.specialty_ar ?? undefined,
-    specialtyRu: row.specialty_ru,
-    specialtyKa: row.specialty_ka,
-    category: row.category,
+    units,
     stats: {
       patients: row.stats_patients,
       experience: row.stats_experience,
@@ -86,21 +82,19 @@ export function rowToDoctor(row: DoctorRow): Doctor {
   };
 }
 
-export function doctorToRow(doc: Doctor, sortOrder = 0): DoctorRow {
+/**
+ * Yalnızca `doctors` satırını üretir. Birimler `doctor_units` tablosunda —
+ * onları yazmak çağıranın sorumluluğu (bkz. saveDoctor, seed).
+ */
+export function doctorToRow(doc: Doctor, sortOrder = 0): Omit<DoctorRow, "doctor_units"> {
   return {
     id: doc.id,
     name: doc.name,
     title: doc.title,
     image: doc.image,
-    specialty_tr: doc.specialtyTr,
-    specialty_en: doc.specialtyEn,
-    specialty_ar: doc.specialtyAr ?? null,
-    specialty_ru: doc.specialtyRu,
-    specialty_ka: doc.specialtyKa,
-    category: doc.category,
     stats_patients: doc.stats.patients,
     stats_experience: doc.stats.experience,
-    stats_surgeries: doc.category === "surgical" ? doc.stats.surgeries ?? null : null,
+    stats_surgeries: isSurgical(doc) ? doc.stats.surgeries ?? null : null,
     email: doc.email,
     education_tr: doc.educationTr ?? [],
     education_en: doc.educationEn ?? [],

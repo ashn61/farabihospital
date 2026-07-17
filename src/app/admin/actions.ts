@@ -34,8 +34,22 @@ export async function signOut(): Promise<void> {
 export async function saveDoctor(doc: Doctor, sortOrder: number): Promise<void> {
   await requireUser();
   const admin = createAdminClient();
-  const { error } = await admin.from("doctors").upsert(doctorToRow(doc, sortOrder), { onConflict: "id" });
+
+  const { error } = await admin
+    .from("doctors")
+    .upsert(doctorToRow(doc, sortOrder), { onConflict: "id" });
   if (error) throw new Error(`saveDoctor failed: ${error.message}`);
+
+  // Birimler ayrı tabloda: önce hekimin mevcut bağlarını sil, sonra seçilenleri yaz.
+  const { error: delErr } = await admin.from("doctor_units").delete().eq("doctor_id", doc.id);
+  if (delErr) throw new Error(`saveDoctor (units temizleme) failed: ${delErr.message}`);
+
+  if (doc.units.length > 0) {
+    const links = doc.units.map((u) => ({ doctor_id: doc.id, unit_id: u.id }));
+    const { error: insErr } = await admin.from("doctor_units").insert(links);
+    if (insErr) throw new Error(`saveDoctor (units yazma) failed: ${insErr.message}`);
+  }
+
   revalidatePath("/");
   revalidatePath(`/doctors/${doc.id}`);
 }

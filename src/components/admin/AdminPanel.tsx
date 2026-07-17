@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Navbar, { Locale } from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import { Doctor, getCleanName, formatDoctorName } from "@/lib/doctors";
+import { Doctor, getCleanName, formatDoctorName, doctorTypes } from "@/lib/doctors";
 import { NewsRow } from "@/lib/data/mappers";
 import { signOut, saveDoctor, deleteDoctor, saveNews, deleteNews, saveUnit, deleteUnit, uploadImage } from "@/app/admin/actions";
 
@@ -66,15 +66,19 @@ export default function AdminPanel({
   // Form States - Doctor
   const [docName, setDocName] = useState("");
   const [docTitle, setDocTitle] = useState("Prof. Dr.");
-  const [docCategory, setDocCategory] = useState<"surgical" | "internal">("surgical");
+  const [docUnitIds, setDocUnitIds] = useState<string[]>([]);
   const [docEmail, setDocEmail] = useState("");
   const [docImage, setDocImage] = useState("https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=400");
   const [docStats, setDocStats] = useState({ experience: 10, patients: 1200, surgeries: 100 });
-  const [docSpec, setDocSpec] = useState({ tr: "", en: "", ar: "", ru: "", ka: "" });
   const [docBio, setDocBio] = useState({ tr: "", en: "", ar: "", ru: "", ka: "" });
   const [docEduTr, setDocEduTr] = useState("");
   const [docEduEn, setDocEduEn] = useState("");
   const [docEduAr, setDocEduAr] = useState("");
+
+  /** Seçili birimlerden en az biri cerrahi mi — "Ameliyat sayısı" alanı buna bağlı. */
+  const selectedUnitsAreSurgical = units.some(
+    (u) => docUnitIds.includes(u.id) && u.type === "surgical"
+  );
 
   // Form States - News
   const [newsImage, setNewsImage] = useState("https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1200");
@@ -137,8 +141,8 @@ export default function AdminPanel({
   // Add / Edit Doctor Handler
   const handleAddDoctor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!docName || !docEmail || !docSpec.tr || !docBio.tr) {
-      showNotification("Lütfen temel hekim bilgilerini ve Türkçe karşılıklarını doldurun.", "error");
+    if (!docName || !docEmail || docUnitIds.length === 0 || !docBio.tr) {
+      showNotification("Lütfen temel hekim bilgilerini, en az bir birimi ve Türkçe karşılıklarını doldurun.", "error");
       return;
     }
 
@@ -151,16 +155,11 @@ export default function AdminPanel({
               name: getCleanName(docName, docTitle),
               title: docTitle,
               image: docImage,
-              specialtyTr: docSpec.tr,
-              specialtyEn: docSpec.en || docSpec.tr,
-              specialtyAr: docSpec.ar || docSpec.en || docSpec.tr,
-              specialtyRu: docSpec.ru || docSpec.tr,
-              specialtyKa: docSpec.ka || docSpec.tr,
-              category: docCategory,
+              units: units.filter((u) => docUnitIds.includes(u.id)),
               stats: {
                 patients: Number(docStats.patients) || 0,
                 experience: Number(docStats.experience) || 0,
-                surgeries: docCategory === "surgical" ? Number(docStats.surgeries) || 0 : undefined
+                surgeries: selectedUnitsAreSurgical ? Number(docStats.surgeries) || 0 : undefined
               },
               email: docEmail,
               educationTr: docEduTr ? docEduTr.split(",").map(item => item.trim()) : ["KTÜ Tıp Fakültesi"],
@@ -189,16 +188,11 @@ export default function AdminPanel({
         name: getCleanName(docName, docTitle),
         title: docTitle,
         image: docImage,
-        specialtyTr: docSpec.tr,
-        specialtyEn: docSpec.en || docSpec.tr,
-        specialtyAr: docSpec.ar || docSpec.en || docSpec.tr,
-        specialtyRu: docSpec.ru || docSpec.tr,
-        specialtyKa: docSpec.ka || docSpec.tr,
-        category: docCategory,
+        units: units.filter((u) => docUnitIds.includes(u.id)),
         stats: {
           patients: Number(docStats.patients) || 0,
           experience: Number(docStats.experience) || 0,
-          surgeries: docCategory === "surgical" ? Number(docStats.surgeries) || 0 : undefined
+          surgeries: selectedUnitsAreSurgical ? Number(docStats.surgeries) || 0 : undefined
         },
         email: docEmail,
         educationTr: docEduTr ? docEduTr.split(",").map(item => item.trim()) : ["KTÜ Tıp Fakültesi"],
@@ -226,20 +220,13 @@ export default function AdminPanel({
     setEditingDoctorId(doc.id);
     setDocName(getCleanName(doc.name, doc.title));
     setDocTitle(doc.title);
-    setDocCategory(doc.category);
+    setDocUnitIds(doc.units.map((u) => u.id));
     setDocEmail(doc.email);
     setDocImage(doc.image);
     setDocStats({
       experience: doc.stats.experience,
       patients: doc.stats.patients,
       surgeries: doc.stats.surgeries || 0
-    });
-    setDocSpec({
-      tr: doc.specialtyTr || "",
-      en: doc.specialtyEn || "",
-      ar: doc.specialtyAr || "",
-      ru: doc.specialtyRu || "",
-      ka: doc.specialtyKa || ""
     });
     setDocBio({
       tr: doc.bioTr || "",
@@ -263,7 +250,7 @@ export default function AdminPanel({
     setEditingDoctorId(null);
     setDocName("");
     setDocEmail("");
-    setDocSpec({ tr: "", en: "", ar: "", ru: "", ka: "" });
+    setDocUnitIds([]);
     setDocBio({ tr: "", en: "", ar: "", ru: "", ka: "" });
     setDocEduTr("");
     setDocEduEn("");
@@ -437,7 +424,7 @@ export default function AdminPanel({
   };
 
   const handleDeleteUnit = async (id: string, tr: string) => {
-    const inUse = doctors.some(d => d.specialtyTr === tr);
+    const inUse = doctors.some(d => d.units.some(u => u.id === id));
     if (inUse) {
       showNotification(`"${tr}" bir veya daha fazla hekim tarafından kullanılıyor; önce onları başka birime taşıyın.`, "error");
       return;
@@ -458,7 +445,7 @@ export default function AdminPanel({
   // Filtering
   const filteredDoctors = doctors.filter(doc =>
     doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.specialtyTr.toLowerCase().includes(searchTerm.toLowerCase())
+    doc.units.some(u => u.tr.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const filteredNews = newsRows.filter(n =>
@@ -538,7 +525,7 @@ export default function AdminPanel({
               <span>Cerrahi Hekimler</span>
             </p>
             <p className="text-2xl font-black text-primary mt-1">
-              {doctors.filter(d => d.category === "surgical").length}
+              {doctors.filter((d) => doctorTypes(d).has("surgical")).length}
             </p>
           </div>
           <div className="glass-panel border rounded-3xl p-5 shadow-2xs">
@@ -547,7 +534,7 @@ export default function AdminPanel({
               <span>Dahili Hekimler</span>
             </p>
             <p className="text-2xl font-black text-primary mt-1">
-              {doctors.filter(d => d.category === "internal").length}
+              {doctors.filter((d) => doctorTypes(d).has("internal")).length}
             </p>
           </div>
           <div className="glass-panel border rounded-3xl p-5 shadow-2xs">
@@ -643,14 +630,14 @@ export default function AdminPanel({
                             </div>
                             <div>
                               <p className="text-xs font-black text-primary leading-tight">{formatDoctorName(doc.name, doc.title, locale)}</p>
-                              <p className="text-[10px] text-neutral-400 font-bold mt-0.5">{doc.specialtyTr}</p>
+                              <p className="text-[10px] text-neutral-400 font-bold mt-0.5">{doc.units.map((u) => u.tr).join(", ")}</p>
                               <div className="flex items-center space-x-2 mt-1">
                                 <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${
-                                  doc.category === "surgical"
+                                  doctorTypes(doc).has("surgical")
                                     ? "bg-orange-50 text-orange-600 border border-orange-200"
                                     : "bg-blue-50 text-blue-600 border border-blue-200"
                                 }`}>
-                                  {doc.category === "surgical" ? "Cerrahi" : "Dahili"}
+                                  {doctorTypes(doc).has("surgical") ? "Cerrahi" : "Dahili"}
                                 </span>
                                 <span className="text-[8px] font-black text-slate-400">ID: {doc.id}</span>
                               </div>
@@ -758,44 +745,60 @@ export default function AdminPanel({
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-[10px] font-black text-primary uppercase tracking-wider mb-1.5">Birim</label>
-                            <select
-                              value={docSpec.tr}
-                              onChange={(e) => {
-                                const u = units.find((x) => x.tr === e.target.value);
-                                if (u) {
-                                  setDocCategory(u.type);
-                                  setDocSpec({ tr: u.tr, en: u.en, ar: u.ar, ru: u.ru, ka: u.ka });
-                                }
-                              }}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary text-primary"
-                            >
-                              <option value="" disabled>Birim seçin</option>
-                              <optgroup label="Cerrahi Birimler">
-                                {units.filter((u) => u.type === "surgical").map((u) => (
-                                  <option key={u.tr} value={u.tr}>{u.tr}</option>
-                                ))}
-                              </optgroup>
-                              <optgroup label="Dahili Birimler">
-                                {units.filter((u) => u.type === "internal").map((u) => (
-                                  <option key={u.tr} value={u.tr}>{u.tr}</option>
-                                ))}
-                              </optgroup>
-                            </select>
+                        <div className="space-y-2">
+                          <label className="text-[11px] font-black text-primary uppercase tracking-wider">
+                            Birimler (Branşlar)
+                          </label>
+                          <p className="text-[10px] text-neutral-400 font-semibold">
+                            Hekim birden fazla birimde görev alabilir. Cerrahi/Dahili ayrımı seçilen
+                            birimlerden türetilir.
+                          </p>
+                          <div className="max-h-64 overflow-y-auto border border-neutral-200 rounded-xl p-3 space-y-1">
+                            {units.map((u) => (
+                              <label
+                                key={u.id}
+                                className="flex items-center gap-2 py-1 px-2 rounded-lg hover:bg-neutral-50 cursor-pointer"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={docUnitIds.includes(u.id)}
+                                  onChange={(e) =>
+                                    setDocUnitIds((prev) =>
+                                      e.target.checked ? [...prev, u.id] : prev.filter((id) => id !== u.id)
+                                    )
+                                  }
+                                  className="accent-[#002d62]"
+                                />
+                                <span className="text-xs font-semibold text-neutral-600">{u.tr}</span>
+                                <span
+                                  className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                    u.type === "surgical"
+                                      ? "bg-primary/10 text-primary"
+                                      : "bg-secondary/10 text-secondary"
+                                  }`}
+                                >
+                                  {u.type === "surgical" ? "Cerrahi" : "Dahili"}
+                                </span>
+                              </label>
+                            ))}
                           </div>
-                          <div>
-                            <label className="block text-[10px] font-black text-primary uppercase tracking-wider mb-1.5">E-posta</label>
-                            <input
-                              type="email"
-                              required
-                              placeholder="hekim@ktu.edu.tr"
-                              value={docEmail}
-                              onChange={(e) => setDocEmail(e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary text-primary"
-                            />
-                          </div>
+                          {docUnitIds.length === 0 && (
+                            <p className="text-[10px] font-bold text-red-500">
+                              En az bir birim seçilmeli.
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-black text-primary uppercase tracking-wider mb-1.5">E-posta</label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="hekim@ktu.edu.tr"
+                            value={docEmail}
+                            onChange={(e) => setDocEmail(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary text-primary"
+                          />
                         </div>
 
                         <div>
@@ -853,8 +856,11 @@ export default function AdminPanel({
                     {doctorFormTab === "langs" && (
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
                         <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
-                          <p className="text-[9px] font-bold text-slate-400 mb-0.5">Seçili Birim</p>
-                          <p className="text-xs font-black text-primary">{docSpec.tr || "— Temel bilgiler sekmesinden birim seçin —"}</p>
+                          <p className="text-[9px] font-bold text-slate-400 mb-0.5">Seçili Birimler</p>
+                          <p className="text-xs font-black text-primary">
+                            {units.filter((u) => docUnitIds.includes(u.id)).map((u) => u.tr).join(", ") ||
+                              "— Temel bilgiler sekmesinden birim seçin —"}
+                          </p>
                         </div>
 
                         <div className="space-y-3 border-t border-slate-100 pt-4">

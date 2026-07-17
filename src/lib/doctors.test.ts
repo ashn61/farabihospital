@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { formatDoctorName, doctorsData } from "./doctors";
+import { formatDoctorName, doctorsData, doctorTypes, isSurgical, type Doctor } from "./doctors";
+import type { UnitRecord } from "./units";
 
 describe("formatDoctorName — Rusça kısaltma", () => {
   // DB'de fiilen kullanılan dört title değeri.
@@ -61,5 +62,55 @@ describe("formatDoctorName — ünvan eşlemesi beş dilde", () => {
         `title="${title}" locale="${locale}" → expected to start with "${expectedPrefix}", got "${result}"`
       ).toBe(true);
     }
+  });
+});
+
+const surgicalUnit: UnitRecord = {
+  id: "u1", tr: "Göğüs Cerrahisi Polikliniği", en: "Thoracic Surgery",
+  ar: "جراحة الصدر", ru: "Торакальная хирургия", ka: "თორაკალური ქირურგია",
+  type: "surgical",
+};
+const internalUnit: UnitRecord = {
+  id: "u2", tr: "Onkoloji Polikliniği", en: "Oncology",
+  ar: "الأورام", ru: "Онкология", ka: "ონკოლოგია",
+  type: "internal",
+};
+
+function makeDoctor(units: UnitRecord[]): Doctor {
+  return {
+    id: "x1", name: "Prof. Dr. Test HEKİM", title: "Prof. Dr.", image: "/x.jpg",
+    units,
+    stats: { patients: 100, experience: 10, surgeries: 5 },
+    email: "t@ktu.edu.tr",
+    educationTr: [], educationEn: [],
+    bioTr: "", bioEn: "", bioRu: "", bioKa: "",
+  };
+}
+
+describe("kategori birimlerden türer", () => {
+  it("tek cerrahi birimi olan hekim yalnızca surgical", () => {
+    const types = doctorTypes(makeDoctor([surgicalUnit]));
+    expect([...types]).toEqual(["surgical"]);
+    expect(isSurgical(makeDoctor([surgicalUnit]))).toBe(true);
+  });
+
+  it("tek dahili birimi olan hekim yalnızca internal", () => {
+    const types = doctorTypes(makeDoctor([internalUnit]));
+    expect([...types]).toEqual(["internal"]);
+    expect(isSurgical(makeDoctor([internalUnit]))).toBe(false);
+  });
+
+  it("cerrahi + dahili birimi olan hekim iki tipte de görünür", () => {
+    const doc = makeDoctor([surgicalUnit, internalUnit]);
+    const types = doctorTypes(doc);
+    expect(types.has("surgical")).toBe(true);
+    expect(types.has("internal")).toBe(true);
+    expect(isSurgical(doc)).toBe(true);
+  });
+
+  it("birimsiz hekim boş küme döner", () => {
+    const doc = makeDoctor([]);
+    expect(doctorTypes(doc).size).toBe(0);
+    expect(isSurgical(doc)).toBe(false);
   });
 });

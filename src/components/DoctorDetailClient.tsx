@@ -15,6 +15,7 @@ import Footer from "@/components/shared/Footer";
 import ChatWidget from "@/components/shared/ChatWidget";
 import { formatDoctorName } from "@/lib/doctors";
 import type { Doctor } from "@/lib/doctors";
+import { unitLabel } from "@/lib/units";
 import { readStoredLocale, storeLocale, PUBLIC_LOCALES } from "@/lib/locale";
 
 const translations = {
@@ -141,13 +142,6 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
   }
 
   // Multi-lingual translation mapping
-  const docSpecialty =
-    locale === "tr" ? doctor.specialtyTr :
-    locale === "en" ? doctor.specialtyEn :
-    locale === "ar" ? (doctor.specialtyAr || doctor.specialtyEn) :
-    locale === "ru" ? doctor.specialtyRu :
-    doctor.specialtyKa;
-
   const docBio =
     locale === "tr" ? doctor.bioTr :
     locale === "en" ? doctor.bioEn :
@@ -211,9 +205,16 @@ export default function DoctorDetailClient({ doctor }: { doctor: Doctor }) {
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-primary tracking-tight leading-tight">
                 {formatDoctorName(doctor.name, doctor.title, locale)}
               </h1>
-              <p className="text-base sm:text-lg text-neutral-500 font-semibold leading-relaxed">
-                {docSpecialty}
-              </p>
+              <div className="flex flex-wrap gap-2">
+                {doctor.units.map((u) => (
+                  <span
+                    key={u.id}
+                    className="text-[11px] font-bold text-primary bg-primary/5 border border-primary/20 rounded-full px-3 py-1"
+                  >
+                    {unitLabel(u, locale)}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* Info warning */}
